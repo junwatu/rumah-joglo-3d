@@ -35,6 +35,7 @@ import {
   applyCustomization
 } from './carriageModel.js';
 import { kinematicState, syncAllCarriageTransforms } from './kinematics.js';
+import { initPerfMonitor } from './perfMonitor.js';
 
 // =========================================================================
 // 1. POPULATE ORTHOGRAPHIC ELEVATION IMAGES & MACRO SWATCHES
@@ -1093,7 +1094,10 @@ function animate() {
   controls.update();
   turntableGroup.updateMatrixWorld();
   updateSVGAnnotations();
+  perfMonitor.beginRender();
   renderer.render(scene, camera);
+  perfMonitor.endFrame();
 }
 
+const perfMonitor = initPerfMonitor(renderer, scene, camera);
 animate();
