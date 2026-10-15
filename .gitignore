@@ -1,0 +1,40 @@
+# Python virtual environments & caches
+.venv/
+.venv_uv/
+venv/
+ENV/
+.uv_cache/
+.uv_python/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Blender backups & intermediate generation outputs
+*.blend1
+*.blend2
+renders/
+textures/
+ui_renders/raw_*.png
+
+# Redundant base64 inline bundles (loaded directly from gothic_carriage.glb & ui_renders/)
+carriage_glb_data.js
+ui_assets.js
+
+# Node / Web tooling
+node_modules/
+dist/
+.env
+.env.*
+
+# OS & Editor metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
