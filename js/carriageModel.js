@@ -93,26 +93,26 @@ export function getDesaturatedTexture(origTex) {
 }
 
 function computeExplodeOffset(name, center) {
-  if (name.startsWith('Chimney_')) return new THREE.Vector3(0, 1.85, 0);
-  if (name.startsWith('Roof_Brunjung')) return new THREE.Vector3(0, 1.35, 0);
-  if (name.startsWith('Roof_')) return new THREE.Vector3(0, 0.95, 0);
-  if (name.startsWith('Body_Tumpang')) return new THREE.Vector3(0, 0.52, 0);
+  if (name.startsWith('Chimney_')) return new THREE.Vector3(0, 2.35, 0);
+  if (name.startsWith('Roof_Brunjung')) return new THREE.Vector3(0, 1.85, 0);
+  if (name.startsWith('Roof_')) return new THREE.Vector3(0, 1.25, 0);
+  if (name.startsWith('Body_Tumpang')) return new THREE.Vector3(0, 0.55, 0);
   if (name.startsWith('Window_Door_L_')) return new THREE.Vector3(-0.65, 0.12, 0.55);
   if (name.startsWith('Window_Door_R_')) return new THREE.Vector3(0.65, 0.12, 0.55);
-  if (name.startsWith('Window_Front_')) return new THREE.Vector3(0, 0.35, 0.65);
+  if (name.startsWith('Window_Front_')) return new THREE.Vector3(0, 0.32, 0.65);
   if (name.startsWith('Window_Rear_L_')) return new THREE.Vector3(-0.85, 0.15, -0.35);
   if (name.startsWith('Window_Rear_R_')) return new THREE.Vector3(0.85, 0.15, -0.35);
   if (name.startsWith('Door_L_')) return new THREE.Vector3(-0.45, 0.08, 0.55);
   if (name.startsWith('Door_R_')) return new THREE.Vector3(0.45, 0.08, 0.55);
-  if (name.startsWith('Lantern_')) return new THREE.Vector3(0, 0.42, 0.25);
+  if (name.startsWith('Lantern_')) return new THREE.Vector3(0, 0.36, 0.25);
   if (name.startsWith('Wheel_FL_')) return new THREE.Vector3(-0.35, -0.16, 0.25);
   if (name.startsWith('Wheel_FR_')) return new THREE.Vector3(0.35, -0.16, 0.25);
   if (name.startsWith('Wheel_RL_')) return new THREE.Vector3(-0.35, -0.16, -0.25);
   if (name.startsWith('Wheel_RR_')) return new THREE.Vector3(0.35, -0.16, -0.25);
   if (name.startsWith('Undercarriage_')) return new THREE.Vector3(0, -0.42, 0);
-  if (name.includes('Skull') || name.startsWith('Rosette_')) return new THREE.Vector3(0, 0.28, 0.52);
+  if (name.includes('Skull') || name.startsWith('Rosette_')) return new THREE.Vector3(0, 0.24, 0.52);
   if (name.startsWith('Interior_')) return new THREE.Vector3(0, 0.12, -0.55);
-  if (name.startsWith('Body_')) return new THREE.Vector3(center.x * 0.18, 0.18, center.z * 0.18);
+  if (name.startsWith('Body_')) return new THREE.Vector3(center.x * 0.16, 0.16, center.z * 0.16);
   return new THREE.Vector3(0, 0, 0);
 }
 
@@ -576,54 +576,54 @@ export function buildProceduralJogloScene() {
   const teakFrameGeos = [];
   const pradaTrimGeos = [];
 
-  // 4 Monumental Soko Guru Columns (y = 0.68 to 2.52)
+  // 4 Monumental Soko Guru Columns (y = 0.68 to 2.26)
   for (const sg of sokoGuruCoords) {
-    teakFrameGeos.push(makeBoxGeo(0.21, 1.84, 0.21, sg.x, 1.60, sg.z));
+    teakFrameGeos.push(makeBoxGeo(0.21, 1.58, 0.21, sg.x, 1.47, sg.z));
     // Carved capital neck & base collars (Prada Gold)
     pradaTrimGeos.push(makeBoxGeo(0.24, 0.06, 0.24, sg.x, 0.74, sg.z));
-    pradaTrimGeos.push(makeBoxGeo(0.25, 0.08, 0.25, sg.x, 2.36, sg.z));
+    pradaTrimGeos.push(makeBoxGeo(0.25, 0.07, 0.25, sg.x, 2.13, sg.z));
     // Carved Santen corbel blocks below Blandar
-    teakFrameGeos.push(makeBoxGeo(0.34, 0.10, 0.26, sg.x, 2.45, sg.z));
-    teakFrameGeos.push(makeBoxGeo(0.26, 0.10, 0.34, sg.x, 2.45, sg.z));
+    teakFrameGeos.push(makeBoxGeo(0.32, 0.09, 0.24, sg.x, 2.21, sg.z));
+    teakFrameGeos.push(makeBoxGeo(0.24, 0.09, 0.32, sg.x, 2.21, sg.z));
   }
 
-  // Sunduk & Kili (Lower stabilizing tie beams between the 4 Soko Guru at y = 2.16)
-  teakFrameGeos.push(makeBoxGeo(1.88, 0.12, 0.14, 0, 2.16,  0.68));
-  teakFrameGeos.push(makeBoxGeo(1.88, 0.12, 0.14, 0, 2.16, -0.68));
-  teakFrameGeos.push(makeBoxGeo(0.14, 0.12, 1.60, -0.82, 2.16, 0));
-  teakFrameGeos.push(makeBoxGeo(0.14, 0.12, 1.60,  0.82, 2.16, 0));
+  // Sunduk & Kili (Lower stabilizing tie beams between the 4 Soko Guru at y = 1.94)
+  teakFrameGeos.push(makeBoxGeo(1.82, 0.09, 0.12, 0, 1.94,  0.68));
+  teakFrameGeos.push(makeBoxGeo(1.82, 0.09, 0.12, 0, 1.94, -0.68));
+  teakFrameGeos.push(makeBoxGeo(0.12, 0.09, 1.54, -0.82, 1.94, 0));
+  teakFrameGeos.push(makeBoxGeo(0.12, 0.09, 1.54,  0.82, 1.94, 0));
 
-  // Blandar & Pengeret (Main upper ring beams atop Soko Guru at y = 2.54)
-  teakFrameGeos.push(makeBoxGeo(1.96, 0.15, 0.18, 0, 2.54,  0.68));
-  teakFrameGeos.push(makeBoxGeo(1.96, 0.15, 0.18, 0, 2.54, -0.68));
-  teakFrameGeos.push(makeBoxGeo(0.18, 0.15, 1.68, -0.82, 2.54, 0));
-  teakFrameGeos.push(makeBoxGeo(0.18, 0.15, 1.68,  0.82, 2.54, 0));
+  // Blandar & Pengeret (Main upper ring beams atop Soko Guru at y = 2.30)
+  teakFrameGeos.push(makeBoxGeo(1.84, 0.12, 0.16, 0, 2.30,  0.68));
+  teakFrameGeos.push(makeBoxGeo(1.84, 0.12, 0.16, 0, 2.30, -0.68));
+  teakFrameGeos.push(makeBoxGeo(0.16, 0.12, 1.56, -0.82, 2.30, 0));
+  teakFrameGeos.push(makeBoxGeo(0.16, 0.12, 1.56,  0.82, 2.30, 0));
 
-  // 12 Outer Soko Pengarak Columns (y = 0.56 to 1.88)
+  // 12 Outer Soko Pengarak Columns (y = 0.56 to 1.80)
   for (const ox of outerX) {
     for (const oz of outerZ) {
       if (Math.abs(ox) < 1.0 && Math.abs(oz) < 1.0) continue;
-      teakFrameGeos.push(makeBoxGeo(0.15, 1.32, 0.15, ox, 1.22, oz));
-      pradaTrimGeos.push(makeBoxGeo(0.175, 0.05, 0.175, ox, 1.78, oz));
+      teakFrameGeos.push(makeBoxGeo(0.15, 1.24, 0.15, ox, 1.18, oz));
+      pradaTrimGeos.push(makeBoxGeo(0.175, 0.05, 0.175, ox, 1.71, oz));
       // Decorative Bahu Danyang eave brackets on outer perimeter columns
       if (Math.abs(ox) > 1.5 || Math.abs(oz) > 1.5) {
-        const dirX = Math.abs(ox) > 1.5 ? Math.sign(ox) * 0.16 : 0;
-        const dirZ = Math.abs(oz) > 1.5 ? Math.sign(oz) * 0.16 : 0;
-        teakFrameGeos.push(makeBoxGeo(0.10 + Math.abs(dirX), 0.14, 0.10 + Math.abs(dirZ), ox + dirX * 0.5, 1.74, oz + dirZ * 0.5));
+        const dirX = Math.abs(ox) > 1.5 ? Math.sign(ox) * 0.14 : 0;
+        const dirZ = Math.abs(oz) > 1.5 ? Math.sign(oz) * 0.14 : 0;
+        teakFrameGeos.push(makeBoxGeo(0.09 + Math.abs(dirX), 0.12, 0.09 + Math.abs(dirZ), ox + dirX * 0.5, 1.68, oz + dirZ * 0.5));
       }
     }
   }
 
-  // Outer Perimeter Ring Beams (Blandar Penanggap at y = 1.88)
-  teakFrameGeos.push(makeBoxGeo(4.48, 0.12, 0.14, 0, 1.88,  1.92));
-  teakFrameGeos.push(makeBoxGeo(4.48, 0.12, 0.14, 0, 1.88, -1.98));
-  teakFrameGeos.push(makeBoxGeo(0.14, 0.12, 4.08, -2.12, 1.88, -0.03));
-  teakFrameGeos.push(makeBoxGeo(0.14, 0.12, 4.08,  2.12, 1.88, -0.03));
+  // Outer Perimeter Ring Beams (Blandar Penanggap at y = 1.81, well inside Penanggap roof eaves)
+  teakFrameGeos.push(makeBoxGeo(4.34, 0.10, 0.12, 0, 1.81,  1.92));
+  teakFrameGeos.push(makeBoxGeo(4.34, 0.10, 0.12, 0, 1.81, -1.98));
+  teakFrameGeos.push(makeBoxGeo(0.12, 0.10, 3.98, -2.12, 1.81, -0.03));
+  teakFrameGeos.push(makeBoxGeo(0.12, 0.10, 3.98,  2.12, 1.81, -0.03));
   // Intermediate tie beams connecting Soko Guru to Soko Pengarak
-  teakFrameGeos.push(makeBoxGeo(4.44, 0.11, 0.12, 0, 1.88,  0.68));
-  teakFrameGeos.push(makeBoxGeo(4.44, 0.11, 0.12, 0, 1.88, -0.68));
-  teakFrameGeos.push(makeBoxGeo(0.12, 0.11, 4.04, -0.82, 1.88, -0.03));
-  teakFrameGeos.push(makeBoxGeo(0.12, 0.11, 4.04,  0.82, 1.88, -0.03));
+  teakFrameGeos.push(makeBoxGeo(4.32, 0.09, 0.11, 0, 1.81,  0.68));
+  teakFrameGeos.push(makeBoxGeo(4.32, 0.09, 0.11, 0, 1.81, -0.68));
+  teakFrameGeos.push(makeBoxGeo(0.11, 0.09, 3.96, -0.82, 1.81, -0.03));
+  teakFrameGeos.push(makeBoxGeo(0.11, 0.09, 3.96,  0.82, 1.81, -0.03));
 
   addNamedMesh(teakFrameGeos, mats.matTeak, 'Body_TealWood');
 
@@ -631,41 +631,42 @@ export function buildProceduralJogloScene() {
   // 4. TUMPANG SARI & DADA PEKSI (STEPPED CORBELED PYRAMID CEILING)
   // =========================================================================
   const tumpangGeos = [];
-  // 5 Inward-stepping pyramid tiers (Tumpang Sari Dalam) + 3 Outward-stepping tiers (Tumpang Sari Luar)
+  const tumpangGoldGeos = [];
+
+  // 5 Inward-stepping pyramid tiers (Tumpang Sari Dalam: y = 2.40 to 2.72, strictly inside Brunjung vault)
   for (let tier = 0; tier < 5; tier++) {
-    const y = 2.64 + tier * 0.075;
-    const inset = tier * 0.12;
-    const spanX = 1.72 - inset * 2.0;
-    const spanZ = 1.44 - inset * 2.0;
-    const bThick = 0.09;
+    const y = 2.40 + tier * 0.08;
+    const spanX = 1.60 - tier * 0.22;
+    const spanZ = 1.32 - tier * 0.20;
+    const bThick = 0.085;
     // Front & Rear tier beams
-    tumpangGeos.push(makeBoxGeo(spanX + bThick, 0.068, bThick, 0, y,  spanZ * 0.5));
-    tumpangGeos.push(makeBoxGeo(spanX + bThick, 0.068, bThick, 0, y, -spanZ * 0.5));
+    tumpangGeos.push(makeBoxGeo(spanX + bThick, 0.064, bThick, 0, y,  spanZ * 0.5));
+    tumpangGeos.push(makeBoxGeo(spanX + bThick, 0.064, bThick, 0, y, -spanZ * 0.5));
     // Left & Right tier beams
-    tumpangGeos.push(makeBoxGeo(bThick, 0.068, spanZ + bThick, -spanX * 0.5, y, 0));
-    tumpangGeos.push(makeBoxGeo(bThick, 0.068, spanZ + bThick,  spanX * 0.5, y, 0));
+    tumpangGeos.push(makeBoxGeo(bThick, 0.064, spanZ + bThick, -spanX * 0.5, y, 0));
+    tumpangGeos.push(makeBoxGeo(bThick, 0.064, spanZ + bThick,  spanX * 0.5, y, 0));
     // Gilded dentil frieze along inner edge of each tier
-    pradaTrimGeos.push(makeBoxGeo(spanX - 0.04, 0.022, 0.022, 0, y - 0.025,  spanZ * 0.5 - 0.04));
-    pradaTrimGeos.push(makeBoxGeo(spanX - 0.04, 0.022, 0.022, 0, y - 0.025, -spanZ * 0.5 + 0.04));
+    tumpangGoldGeos.push(makeBoxGeo(spanX - 0.04, 0.020, 0.020, 0, y - 0.022,  spanZ * 0.5 - 0.04));
+    tumpangGoldGeos.push(makeBoxGeo(spanX - 0.04, 0.020, 0.020, 0, y - 0.022, -spanZ * 0.5 + 0.04));
   }
 
-  // Outward-stepping Tumpang Sari Luar (3 tiers supporting Brunjung eaves)
-  for (let tier = 1; tier <= 3; tier++) {
-    const y = 2.58 + tier * 0.065;
-    const outset = tier * 0.11;
-    const spanX = 1.72 + outset * 2.0;
-    const spanZ = 1.44 + outset * 2.0;
-    tumpangGeos.push(makeBoxGeo(spanX, 0.058, 0.08, 0, y,  spanZ * 0.5));
-    tumpangGeos.push(makeBoxGeo(spanX, 0.058, 0.08, 0, y, -spanZ * 0.5));
-    tumpangGeos.push(makeBoxGeo(0.08, 0.058, spanZ, -spanX * 0.5, y, 0));
-    tumpangGeos.push(makeBoxGeo(0.08, 0.058, spanZ,  spanX * 0.5, y, 0));
+  // 2 Compact Outward-stepping corbel bands (Tumpang Sari Luar: y = 2.39 & 2.44, strictly inside Penanggap collar)
+  for (let tier = 1; tier <= 2; tier++) {
+    const y = 2.34 + tier * 0.05;
+    const spanX = 1.76 + tier * 0.08;
+    const spanZ = 1.48 + tier * 0.08;
+    tumpangGeos.push(makeBoxGeo(spanX, 0.050, 0.07, 0, y,  spanZ * 0.5));
+    tumpangGeos.push(makeBoxGeo(spanX, 0.050, 0.07, 0, y, -spanZ * 0.5));
+    tumpangGeos.push(makeBoxGeo(0.07, 0.050, spanZ, -spanX * 0.5, y, 0));
+    tumpangGeos.push(makeBoxGeo(0.07, 0.050, spanZ,  spanX * 0.5, y, 0));
   }
 
-  // Sacred Central Dada Peksi King-Beam & Carved Lotus Rosette at (0, 2.94, 0)
-  tumpangGeos.push(makeBoxGeo(0.92, 0.08, 0.14, 0, 2.94, 0));
-  pradaTrimGeos.push(makeCylinderGeo(0.16, 0.12, 0.05, 16, 0, 2.90, 0));
+  // Sacred Central Dada Peksi King-Beam & Carved Lotus Rosette at (0, 2.78, 0)
+  tumpangGeos.push(makeBoxGeo(0.68, 0.075, 0.14, 0, 2.78, 0));
+  tumpangGoldGeos.push(makeCylinderGeo(0.15, 0.11, 0.048, 16, 0, 2.74, 0));
 
   addNamedMesh(tumpangGeos, mats.matDarkTeak, 'Body_TumpangSari');
+  addNamedMesh(tumpangGoldGeos, mats.matPradaGold, 'Body_TumpangBrass');
 
   // =========================================================================
   // 5. GEBYOK UKIR JAWA PARTITION WALL, DALEM ENCLOSURE & SANCTUARY
@@ -771,13 +772,13 @@ export function buildProceduralJogloScene() {
 
   // B. Central Upper Transom Awning Window (`Window_Front_*`)
   {
-    const frontWinHinge = new THREE.Vector3(0.0, 2.18, 0.68);
+    const frontWinHinge = new THREE.Vector3(0.0, 2.23, 0.68);
     const fFrame = [
-      makeBoxGeo(1.36, 0.28, 0.045, 0, -0.14, 0),
-      makeBoxGeo(0.04, 0.26, 0.055, -0.34, -0.14, 0),
-      makeBoxGeo(0.04, 0.26, 0.055,  0.34, -0.14, 0)
+      makeBoxGeo(1.36, 0.22, 0.045, 0, -0.11, 0),
+      makeBoxGeo(0.04, 0.20, 0.055, -0.34, -0.11, 0),
+      makeBoxGeo(0.04, 0.20, 0.055,  0.34, -0.11, 0)
     ];
-    const fGlass = makeBoxGeo(1.28, 0.22, 0.02, 0, -0.14, 0);
+    const fGlass = makeBoxGeo(1.28, 0.17, 0.02, 0, -0.11, 0);
     addNamedMesh(fFrame, mats.matTeak, 'Window_Front_Slate', frontWinHinge);
     addNamedMesh(fGlass, mats.matStainedGlass, 'Window_Front_Glass', frontWinHinge);
   }
@@ -799,16 +800,16 @@ export function buildProceduralJogloScene() {
   // =========================================================================
   // 8. DUAL-PITCHED JOGLO ROOF: ATAP PENANGGAP & ATAP BRUNJUNG (`Roof_*`, `Chimney_*`)
   // =========================================================================
-  // A. Lower Hipped Skirt Roof (Atap Penanggap: y = 1.76 to 2.52)
-  const penanggapGeo = buildTrapezoidalRoofShell(2.58, 2.38, 1.76, 1.06, 0.88, 2.52, 0.055);
+  // A. Lower Hipped Skirt Roof (Atap Penanggap: y = 1.72 to 2.52)
+  const penanggapGeo = buildTrapezoidalRoofShell(2.62, 2.42, 1.72, 1.08, 0.90, 2.52, 0.055);
   addNamedMesh(penanggapGeo, mats.matRoofTile, 'Roof_SlateStructure');
 
   // Carved Eave Fascia Boards (Lisplang Ukir Jati) & Exposed Usuk Rafters
   const lisplangGeos = [];
-  lisplangGeos.push(makeBoxGeo(5.20, 0.11, 0.04, 0, 1.73,  2.39));
-  lisplangGeos.push(makeBoxGeo(5.20, 0.11, 0.04, 0, 1.73, -2.39));
-  lisplangGeos.push(makeBoxGeo(0.04, 0.11, 4.78, -2.59, 1.73, 0));
-  lisplangGeos.push(makeBoxGeo(0.04, 0.11, 4.78,  2.59, 1.73, 0));
+  lisplangGeos.push(makeBoxGeo(5.28, 0.11, 0.04, 0, 1.69,  2.43));
+  lisplangGeos.push(makeBoxGeo(5.28, 0.11, 0.04, 0, 1.69, -2.43));
+  lisplangGeos.push(makeBoxGeo(0.04, 0.11, 4.86, -2.63, 1.69, 0));
+  lisplangGeos.push(makeBoxGeo(0.04, 0.11, 4.86,  2.63, 1.69, 0));
   addNamedMesh(lisplangGeos, mats.matTeak, 'Roof_TealCeiling');
 
   // B. Upper Towering Steep Trapezoidal Roof (Atap Brunjung: y = 2.48 to 3.56)
@@ -1139,7 +1140,7 @@ export function setupCarriageModel(gltfScene, turntableGroup, loadingBanner, onM
     // Assign to Javanese Customization Material Buckets
     if (
       name.includes('Teal') ||
-      name.includes('Tumpang') ||
+      name === 'Body_TumpangSari' ||
       name === 'Body_SlateTrim' ||
       name === 'Interior_Wood' ||
       (name.startsWith('Window_') && name.includes('Slate'))

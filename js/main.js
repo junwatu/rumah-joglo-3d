@@ -1004,8 +1004,12 @@ function animate() {
     m.position
       .copy(m.userData.restPosition)
       .addScaledVector(m.userData.explodeVec, currentExplodeT);
-    if (m.name.startsWith('Roof_') || m.name.startsWith('Chimney_')) {
-      m.position.y += currentCutawayT * 0.68;
+    if (m.name.startsWith('Chimney_')) {
+      m.position.y += currentCutawayT * 1.65;
+    } else if (m.name === 'Roof_Brunjung') {
+      m.position.y += currentCutawayT * 1.38;
+    } else if (m.name.startsWith('Roof_')) {
+      m.position.y += currentCutawayT * 0.98;
     }
   }
 

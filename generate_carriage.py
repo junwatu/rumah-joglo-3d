@@ -113,29 +113,29 @@ def build_joglo_glb_pure_python(glb_path):
     # 4. Soko Guru, Soko Pengarak & Tie Beams
     teak_parts = []
     for sx, sz in [(-0.82, 0.68), (0.82, 0.68), (-0.82, -0.68), (0.82, -0.68)]:
-        add_box_to_list(teak_parts, 0.21, 1.84, 0.21, sx, 1.60, sz)
+        add_box_to_list(teak_parts, 0.21, 1.58, 0.21, sx, 1.47, sz)
     for ox in (-2.12, -0.82, 0.82, 2.12):
         for oz in (-1.98, -0.68, 0.68, 1.92):
             if abs(ox) < 1.0 and abs(oz) < 1.0:
                 continue
-            add_box_to_list(teak_parts, 0.15, 1.32, 0.15, ox, 1.22, oz)
-    add_box_to_list(teak_parts, 1.96, 0.15, 0.18, 0, 2.54, 0.68)
-    add_box_to_list(teak_parts, 1.96, 0.15, 0.18, 0, 2.54, -0.68)
-    add_box_to_list(teak_parts, 0.18, 0.15, 1.68, -0.82, 2.54, 0)
-    add_box_to_list(teak_parts, 0.18, 0.15, 1.68, 0.82, 2.54, 0)
+            add_box_to_list(teak_parts, 0.15, 1.24, 0.15, ox, 1.18, oz)
+    add_box_to_list(teak_parts, 1.84, 0.12, 0.16, 0, 2.30, 0.68)
+    add_box_to_list(teak_parts, 1.84, 0.12, 0.16, 0, 2.30, -0.68)
+    add_box_to_list(teak_parts, 0.16, 0.12, 1.56, -0.82, 2.30, 0)
+    add_box_to_list(teak_parts, 0.16, 0.12, 1.56, 0.82, 2.30, 0)
     meshes_spec.append(("Body_TealWood", 0, (0, 0, 0), merge_parts(teak_parts)))
 
     # 5. Stepped Tumpang Sari Ceiling
     ts_parts = []
     for tier in range(5):
-        y = 2.64 + tier * 0.075
-        span_x = 1.72 - tier * 0.24
-        span_z = 1.44 - tier * 0.24
-        add_box_to_list(ts_parts, span_x, 0.068, 0.09, 0, y, span_z * 0.5)
-        add_box_to_list(ts_parts, span_x, 0.068, 0.09, 0, y, -span_z * 0.5)
-        add_box_to_list(ts_parts, 0.09, 0.068, span_z, -span_x * 0.5, y, 0)
-        add_box_to_list(ts_parts, 0.09, 0.068, span_z, span_x * 0.5, y, 0)
-    add_box_to_list(ts_parts, 0.92, 0.08, 0.14, 0, 2.94, 0)
+        y = 2.40 + tier * 0.08
+        span_x = 1.60 - tier * 0.22
+        span_z = 1.32 - tier * 0.20
+        add_box_to_list(ts_parts, span_x, 0.064, 0.085, 0, y, span_z * 0.5)
+        add_box_to_list(ts_parts, span_x, 0.064, 0.085, 0, y, -span_z * 0.5)
+        add_box_to_list(ts_parts, 0.085, 0.064, span_z, -span_x * 0.5, y, 0)
+        add_box_to_list(ts_parts, 0.085, 0.064, span_z, span_x * 0.5, y, 0)
+    add_box_to_list(ts_parts, 0.68, 0.075, 0.14, 0, 2.78, 0)
     meshes_spec.append(("Body_TumpangSari", 0, (0, 0, 0), merge_parts(ts_parts)))
 
     # 6. Gebyok Ukir Wall & Hinged Kori Agung Doors
@@ -151,7 +151,7 @@ def build_joglo_glb_pure_python(glb_path):
         meshes_spec.append((f"Door_{side_tag}_Teal", 0, (sx * 0.42, 1.04, -0.68), merge_parts(d_parts)))
 
     # 7. Dual-Pitched Joglo Roof (Penanggap + Brunjung + Mustaka Crown)
-    p_v, p_n, p_t = make_frustum_verts_tris(2.58, 2.38, 1.76, 1.06, 0.88, 2.52)
+    p_v, p_n, p_t = make_frustum_verts_tris(2.62, 2.42, 1.72, 1.08, 0.90, 2.52)
     meshes_spec.append(("Roof_SlateStructure", 1, (0, 0, 0), (p_v, p_n, p_t)))
 
     b_v, b_n, b_t = make_frustum_verts_tris(1.12, 0.94, 2.48, 0.44, 0.06, 3.56)

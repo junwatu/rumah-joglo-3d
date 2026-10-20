@@ -108,7 +108,7 @@ export function deformCarriageGeometry(sy, sCrown, sCab, chimMode, sWF, sRim, ca
         let newWz = wz;
 
         // 1. Soko Guru Master Column Girth Scaling (`sWF`) around each of the 4 central pillars (±0.82, ±0.68)
-        if (isTimberFrame && wy >= 0.65 && wy <= 2.46) {
+        if (isTimberFrame && wy >= 0.65 && wy <= 2.24) {
           for (const sgx of [-0.82, 0.82]) {
             for (const sgz of [-0.68, 0.68]) {
               const dx = wx - sgx;
@@ -122,13 +122,13 @@ export function deformCarriageGeometry(sy, sCrown, sCab, chimMode, sWF, sRim, ca
         }
 
         // 2. Tumpang Sari Stepped Ceiling Beam Relief Depth (`sRim`)
-        if (isTumpang && wy > 2.55) {
-          newWy = 2.58 + (wy - 2.58) * sRim;
+        if (isTumpang && wy > 2.36 && Math.abs(wx) < 0.88 && Math.abs(wz) < 0.74) {
+          newWy = 2.36 + (wy - 2.36) * sRim;
         }
 
         // 3. Penanggap Eaves Overhang Span (`sCab`) & Upturned Eave Flare (`camberDeg`)
         if (isRoof && wy < 2.50) {
-          const rNorm = Math.max(0.0, (Math.max(Math.abs(wx) / 2.58, Math.abs(wz) / 2.38) - 0.42) / 0.58);
+          const rNorm = Math.max(0.0, (Math.max(Math.abs(wx) / 2.62, Math.abs(wz) / 2.42) - 0.42) / 0.58);
           const spanMult = 1.0 + (sCab - 1.0) * rNorm;
           newWx = wx * spanMult;
           newWz = wz * spanMult;
