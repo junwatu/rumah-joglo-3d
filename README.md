@@ -41,3 +41,9 @@ To also run the offline `bpy` generator:
 ```bash
 python3 generate_carriage.py
 ```
+
+---
+
+## Demo
+
+See the project in action: [X / Twitter — junwatu](https://x.com/junwatu/status/2112382518251159962?s=20)
