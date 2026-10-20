@@ -1,30 +1,16 @@
-# Gothic Victorian Carriage (GVC-001) — Procedural 3D Generator & Three.js Configurator
+# Rumah Joglo Jawa (RJ-001) — Procedural 3D Architecture & Three.js Configurator
 
-A 100% code-generated 3D Gothic Victorian Carriage (`GVC-001`) built with a procedural Python (`bpy` + `bmesh`) geometry/texture pipeline and an interactive **Three.js** web configurator.
+A 100% code-generated 3D **Rumah Joglo Jawa (`RJ-001`)** built with an instant browser-native **Three.js** procedural geometry & PBR texture synthesizer, plus an offline Python (`generate_carriage.py` & `generate_ui_assets.py`) generator.
 
 ---
 
-## Architecture
+## Architectural Ensemble (`RJ-001`)
 
-```text
-├── index.html                  # Semantic HTML5 presentation sheet & configurator UI
-├── css/
-│   └── styles.css              # Victorian drafting & Bespoke Atelier stylesheet
-├── js/
-│   ├── main.js                 # Scene setup, lighting, UI controls, zero-allocation SVG callouts & render loop
-│   ├── config.js               # Metric baselines, camera presets, material palettes & curated themes
-│   ├── carriageModel.js        # Native binary GLB streaming, depth-offset hierarchy & procedural add-ons
-│   ├── kinematics.js           # Real-time vertex morphing & multi-body suspension/clearance solver
-│   └── environment.js          # Procedural feathered cobblestone road patch & 3D road stones
-├── gothic_carriage.glb         # Compiled 3D carriage model with embedded PBR textures
-├── ui_renders/                 # Orthographic elevation drawings & macro material swatches
-├── generate_carriage.py        # Headless Python compiler entry point -> gothic_carriage.glb
-├── carriage_body.py            # Procedural cabin hull, Gothic arches, doors, windows & lanterns
-├── carriage_roof.py            # Procedural barrel-vault roof, iron cresting & finials
-├── carriage_undercarriage.py   # Procedural 12-spoke wheels, leaf springs, chassis & fifth-wheel steer
-├── carriage_materials.py       # Principled BSDF materials & bmesh geometry/UV utilities
-└── procedural_textures.py      # Procedural PBR BaseColor, Normal, Roughness & Metallic map synthesizer
-```
+1. **Undak-Undakan & Pelataran**: Two-stepped volcanic andesite stone plinth (*batur*), front *trap-trapan* entry stairs with *pipi tangga* cheek walls, and Kraton geometric floor tiles surrounded by a feathered *Batu Candi* courtyard.
+2. **Umpak Batu & Soko Guru**: 4 monumental central *Soko Guru* teak columns + 12 outer *Soko Pengarak* perimeter columns seated on carved black andesite *Umpak* pedestals, linked by *Sunduk-Kili* and *Blandar-Pengeret* beams.
+3. **Tumpang Sari & Dada Peksi**: 8-tier stepped corbeled pyramid ceiling (*5 inward tiers + 3 outward tiers*) culminating in the sacred *Dada Peksi* king-beam with a gilded lotus rosette and hanging *Lampu Robyong* chandelier.
+4. **Gebyok Ukir Jawa & Dalem Agung**: Hand-carved teak partition wall featuring a *Gunungan Kayon* (or *Kala Makara*) pediment, hinged *Kori Agung* double doors, 5 articulated *Krepyak* & stained-glass windows, and the inner *Krobongan / Senthong Tengah* royal sanctuary.
+5. **Atap Penanggap, Brunjung & Mustaka**: Dual-pitched Javanese roof with lower *Penanggap* hipped skirt roof, steep central *Brunjung* trapezoidal roof, *Sungut* ridge horns, and a central *Mustaka* royal crown finial.
 
 ---
 
@@ -37,15 +23,21 @@ python3 -m http.server 5174
 ```
 
 Then open [http://localhost:5174](http://localhost:5174) in your browser.
+- Click **`⇩ .GLB`** in the top-left panel at any time to export and download your customized 3D Rumah Joglo as `rumah_joglo_rj001.glb`.
+- Click **`Inspect Tumpang Sari Ceiling`** to ghost and lift the outer roof so you can inspect the stepped *Tumpang Sari* ceiling beams inside.
 
 ---
 
-## Regenerating the 3D Model (`gothic_carriage.glb`)
+## Regenerating UI Elevations & Offline `.GLB`
 
-To rebuild the 3D carriage model and PBR textures from scratch using Python:
+To regenerate the orthographic elevation drawings (`ui_renders/elev_*.png`) and macro swatches (`ui_renders/swatch_*.png`) using pure Python (zero third-party dependencies required):
 
 ```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python generate_carriage.py
+python3 generate_ui_assets.py
+```
+
+To also run the offline `bpy` generator:
+
+```bash
+python3 generate_carriage.py
 ```

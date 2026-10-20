@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {
-  PATCH_LENGTH,
   BASE_DRIVE_SPEED,
   BASE_WIDTH_MM,
   BASE_HEIGHT_MM,
@@ -26,15 +25,20 @@ import {
   rearRightWindowMeshes,
   interactiveWindowMeshes,
   interactiveDoorMeshes,
+  frontLanternMeshes,
+  rearLanternMeshes,
   lanternGlassMeshes,
+  roofMeshes,
+  chimneyMeshes,
   sprungBodyMeshes,
   undercarriageMeshes,
   allCarriageMeshes,
   lanternLightState,
   loadCarriageGLB,
+  exportJogloToGLB,
   applyCustomization
 } from './carriageModel.js';
-import { kinematicState, syncAllCarriageTransforms } from './kinematics.js';
+import { syncAllCarriageTransforms } from './kinematics.js';
 import { initPerfMonitor } from './perfMonitor.js';
 
 // =========================================================================
@@ -63,7 +67,7 @@ function updateViewModeThumbnails(activeView) {
 updateViewModeThumbnails('iso');
 
 // =========================================================================
-// 2. THREE.JS SCENE, STUDIO HERITAGE LIGHTING & FEATHERED COBBLESTONE ROAD
+// 2. THREE.JS SCENE, JAVANESE HERITAGE LIGHTING & PELATARAN COURTYARD
 // =========================================================================
 const canvasWrap = document.getElementById('carriage-canvas-wrap');
 const canvas = document.getElementById('carriage-canvas');
@@ -85,7 +89,7 @@ renderer.toneMappingExposure = 1.18;
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(34, 1, 0.25, 45);
+const camera = new THREE.PerspectiveCamera(34, 1, 0.25, 55);
 
 const _camDirNorm = new THREE.Vector3();
 function computeFittedCameraPos(dirVec, targetVec, reqWidth, reqHeight, explodeScale = 1.0) {
@@ -103,20 +107,20 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.copy(HERO_TARGET);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
-controls.maxPolarAngle = Math.PI * 0.49;
-controls.minDistance = 2.2;
-controls.maxDistance = 28.0;
+controls.maxPolarAngle = Math.PI * 0.495;
+controls.minDistance = 2.0;
+controls.maxDistance = 32.0;
 
-const hemiLight = new THREE.HemisphereLight(0xfff8ed, 0x8f7e6a, 1.45);
+const hemiLight = new THREE.HemisphereLight(0xfff7e8, 0x8c7965, 1.50);
 scene.add(hemiLight);
 
-const keyLight = new THREE.DirectionalLight(0xfff3de, 2.75);
-keyLight.position.set(-5.5, 7.8, 5.2);
+const keyLight = new THREE.DirectionalLight(0xfff2dc, 2.80);
+keyLight.position.set(-6.0, 8.8, 6.2);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(2048, 2048);
 keyLight.shadow.camera.near = 1.0;
-keyLight.shadow.camera.far = 24.0;
-const sc = 4.2;
+keyLight.shadow.camera.far = 28.0;
+const sc = 4.8;
 keyLight.shadow.camera.left = -sc;
 keyLight.shadow.camera.right = sc;
 keyLight.shadow.camera.top = sc;
@@ -125,30 +129,33 @@ keyLight.shadow.bias = -0.0005;
 scene.add(keyLight);
 
 const rimLight = new THREE.DirectionalLight(0xdce8f2, 1.15);
-rimLight.position.set(5.0, 4.5, -5.0);
+rimLight.position.set(5.5, 5.0, -5.5);
 scene.add(rimLight);
 
-const fillLight = new THREE.DirectionalLight(0xf7e7cf, 0.90);
-fillLight.position.set(-3.0, 2.2, -4.5);
+const fillLight = new THREE.DirectionalLight(0xf7e6cc, 0.95);
+fillLight.position.set(-3.5, 2.0, 4.8);
 scene.add(fillLight);
 
-const interiorGlow = new THREE.PointLight(0xffa845, 2.2, 3.8, 1.5);
-interiorGlow.position.set(0.0, 2.05, -0.15);
+// Dalem Agung / Krobongan Sanctuary Glow
+const interiorGlow = new THREE.PointLight(0xffaa42, 2.5, 4.5, 1.4);
+interiorGlow.position.set(0.0, 1.55, -1.35);
 scene.add(interiorGlow);
 
-const { patchMesh: cobblePatch, mapTex: roadMapTex, bumpTex: roadBumpTex } = createFeatheredCobblestonePatch();
+const { patchMesh: cobblePatch } = createFeatheredCobblestonePatch();
 const turntableGroup = new THREE.Group();
 scene.add(turntableGroup);
 turntableGroup.add(cobblePatch);
 
 const roadStones = buildRoadStones(turntableGroup);
 
-const frontLanternGlow = new THREE.PointLight(0xffad42, 1.85, 3.2, 1.6);
-frontLanternGlow.position.set(0.0, 2.06, 1.38);
+// Pendopo Central Lampu Robyong Chandelier Glow
+const frontLanternGlow = new THREE.PointLight(0xffb248, 2.4, 5.2, 1.4);
+frontLanternGlow.position.set(0.0, 2.05, 0.35);
 turntableGroup.add(frontLanternGlow);
 
-const rearLanternGlow = new THREE.PointLight(0xffad42, 1.85, 3.2, 1.6);
-rearLanternGlow.position.set(0.0, 2.06, -1.88);
+// Rear Sanctuary & Eaves Glow
+const rearLanternGlow = new THREE.PointLight(0xffb248, 1.85, 4.2, 1.5);
+rearLanternGlow.position.set(0.0, 1.80, -1.65);
 turntableGroup.add(rearLanternGlow);
 
 const lights = { interiorGlow, frontLanternGlow, rearLanternGlow };
@@ -202,9 +209,9 @@ const uiRefs = {
 
 function updateAtelierSummary() {
   if (!atelierSummaryText) return;
-  const wMM = Math.round((BASE_WIDTH_MM * carriageConfig.widthScale) / 10) * 10;
-  const hMM = Math.round((BASE_HEIGHT_MM * carriageConfig.heightScale * (0.78 + 0.22 * carriageConfig.roofCrownScale)) / 10) * 10;
-  const lMM = Math.round((BASE_LENGTH_MM * carriageConfig.lengthScale) / 10) * 10;
+  const wMM = Math.round((BASE_WIDTH_MM * carriageConfig.widthScale * (0.85 + 0.15 * carriageConfig.cabinScale)) / 10) * 10;
+  const hMM = Math.round((BASE_HEIGHT_MM * (carriageConfig.heightScale * (0.72 + 0.28 * carriageConfig.roofCrownScale) + carriageConfig.rideHeightOffset / 3.8)) / 10) * 10;
+  const lMM = Math.round((BASE_LENGTH_MM * carriageConfig.lengthScale * (0.85 + 0.15 * carriageConfig.cabinScale)) / 10) * 10;
   atelierSummaryText.innerHTML = `${carriageConfig.timberLabel} &bull; ${carriageConfig.wheelLabel} &bull; ${lMM} &times; ${wMM} &times; ${hMM} MM`;
 }
 
@@ -218,7 +225,7 @@ function triggerSyncTransforms() {
   });
 }
 
-// Load GLB Model
+// Build / Load Rumah Joglo 3D Model
 loadCarriageGLB(turntableGroup, loadingBanner, triggerSyncTransforms);
 
 function selectFinishSwatch(grpName, val) {
@@ -294,7 +301,7 @@ document.querySelectorAll('.atelier-tab-btn').forEach((tabBtn) => {
   });
 });
 
-// Bind Proportions & Wheel Sliders (with Double-Click-to-Reset and Click-Badge-to-Reset)
+// Bind Proportions & Structural Sliders
 const sliderPropMap = new Map();
 const bindSlider = (el, propName) => {
   if (!el) return;
@@ -344,7 +351,6 @@ document.querySelectorAll('[data-reset-slider]').forEach((badge) => {
   });
 });
 
-// Helper & Binding for Segmented Option Pills (wheel_style, medallions, chimney, lanterns_mode)
 function selectSegmentedOption(segKey, val) {
   const segGroup = document.querySelector(`[data-seg="${segKey}"]`);
   if (segGroup) {
@@ -374,9 +380,9 @@ document.querySelectorAll('[data-seg]').forEach((segGroup) => {
 });
 
 // =========================================================================
-// 4. INTERACTIVE CONTROLS: SELF-DRIVE, DOOR, WINDOW, LANTERNS, WIREFRAME, EXPLODED, PRESETS & RESET
+// 4. INTERACTIVE CONTROLS: ROOF CUTAWAY (TUMPANG SARI), DOORS, WINDOWS, LANTERNS, WIREFRAME, EXPLODED, EXPORT GLB
 // =========================================================================
-let isDrivingOnRoad = true;
+let isRoofCutaway = false;
 let isRotating = false;
 let isWireframe = false;
 let isDoorOpen = false;
@@ -392,10 +398,7 @@ let currentWinSideRad = 0.0;
 let currentWinFrontRad = 0.0;
 let currentWinRearRad = 0.0;
 let currentExplodeT = 0.0;
-let roadScrollDist = 0.0;
-let bodyHeaveY = 0.0;
-let bodyHeaveVel = 0.0;
-let bodyPitch = 0.0;
+let currentCutawayT = 0.0;
 
 const btnDriveRoad = document.getElementById('btn-drive-road');
 const driveRoadLabel = document.getElementById('drive-road-label');
@@ -405,6 +408,7 @@ const btnDoor = document.getElementById('btn-door');
 const btnWindow = document.getElementById('btn-window');
 const btnLanterns = document.getElementById('btn-lanterns');
 const btnExploded = document.getElementById('btn-exploded');
+const btnExportGlb = document.getElementById('btn-export-glb');
 const btnResetCustom = document.getElementById('btn-reset-custom');
 const btnDockReset = document.getElementById('btn-dock-reset');
 const viewCards = document.querySelectorAll('.view-card');
@@ -412,7 +416,7 @@ const elevPlates = document.querySelectorAll('[data-elev-view]');
 const swatchItems = document.querySelectorAll('.swatch-item');
 const calloutItems = document.querySelectorAll('.callout-item');
 
-// Direct One-Click Coach Door Mode (Closed | Left | Right | Both)
+// Direct One-Click Kori Agung Door Mode (Closed | Left | Right | Both)
 function setDirectDoorMode(mode, customAngle = null) {
   document.querySelectorAll('#seg-door-mode .seg-pill').forEach((b) => {
     b.classList.toggle('active', b.dataset.dmode === mode);
@@ -462,7 +466,7 @@ if (sliderDoorAngle) {
   });
 }
 
-// Direct One-Click Casement Window Mode (Closed | Doors | Front | Rear | All 5)
+// Direct One-Click Krepyak Window Mode (Closed | Gebyok | Transom | Dalem | All 5)
 function setDirectWindowMode(mode, customAngle = null) {
   document.querySelectorAll('#seg-window-mode .seg-pill').forEach((b) => {
     b.classList.toggle('active', b.dataset.wmode === mode);
@@ -477,7 +481,7 @@ function setDirectWindowMode(mode, customAngle = null) {
     carriageConfig.activeWindows.side = (mode === 'side' || mode === 'all');
     carriageConfig.activeWindows.front = (mode === 'front' || mode === 'all');
     carriageConfig.activeWindows.rear = (mode === 'rear' || mode === 'all');
-    targetWindowDeg = customAngle !== null ? customAngle : (targetWindowDeg > 5.0 ? targetWindowDeg : 62.0);
+    targetWindowDeg = customAngle !== null ? customAngle : (targetWindowDeg > 5.0 ? targetWindowDeg : 60.0);
     isWindowOpen = true;
   }
   if (sliderWindowAngle) sliderWindowAngle.value = String(Math.round(targetWindowDeg));
@@ -515,7 +519,7 @@ if (sliderWindowAngle) {
   });
 }
 
-// One-Click Curated Designer Themes in the Left Sidebar ("Bespoke Atelier")
+// One-Click Curated Javanese Architectural Themes
 document.querySelectorAll('#atelier-preset-grid .preset-chip').forEach((chip) => {
   chip.addEventListener('click', () => {
     const presetKey = chip.dataset.preset;
@@ -593,11 +597,36 @@ function setViewMode(mode, instant = false) {
   }
 }
 
-btnDriveRoad.addEventListener('click', () => {
-  isDrivingOnRoad = !isDrivingOnRoad;
-  btnDriveRoad.classList.toggle('active', isDrivingOnRoad);
-  driveRoadLabel.textContent = isDrivingOnRoad ? 'Drive On Road: Active' : 'Drive On Road: Paused';
-});
+// Top Full-Width Toggle: Roof Cutaway (Inspect Tumpang Sari Ceiling)
+function setRoofCutawayMode(active) {
+  isRoofCutaway = active;
+  if (btnDriveRoad) btnDriveRoad.classList.toggle('active', isRoofCutaway);
+  if (driveRoadLabel) {
+    driveRoadLabel.textContent = isRoofCutaway
+      ? 'Tumpang Sari Cutaway: Active'
+      : 'Inspect Tumpang Sari Ceiling';
+  }
+  for (const rm of [...roofMeshes, ...chimneyMeshes]) {
+    if (rm.material) {
+      rm.material.transparent = isRoofCutaway;
+      rm.material.opacity = isRoofCutaway ? 0.22 : 1.0;
+      rm.material.depthWrite = !isRoofCutaway;
+      rm.material.needsUpdate = true;
+    }
+  }
+}
+
+if (btnDriveRoad) {
+  btnDriveRoad.addEventListener('click', () => {
+    setRoofCutawayMode(!isRoofCutaway);
+  });
+}
+
+if (btnExportGlb) {
+  btnExportGlb.addEventListener('click', () => {
+    exportJogloToGLB('rumah_joglo_rj001.glb');
+  });
+}
 
 btnRotate.addEventListener('click', () => {
   isRotating = !isRotating;
@@ -625,7 +654,7 @@ btnLanterns.addEventListener('click', () => {
   btnLanterns.classList.toggle('active', isLanternsLit);
   for (const lg of lanternGlassMeshes) {
     if (lg.material) {
-      lg.material.emissiveIntensity = isLanternsLit ? 0.75 : 0.0;
+      lg.material.emissiveIntensity = isLanternsLit ? 0.85 : 0.0;
     }
   }
 });
@@ -667,12 +696,13 @@ function resetAllCarriageCustomizations() {
 
   setDirectDoorMode('closed');
   setDirectWindowMode('closed');
+  setRoofCutawayMode(false);
   triggerSyncTransforms();
 
   isLanternsLit = true;
   btnLanterns.classList.add('active');
   for (const lg of lanternGlassMeshes) {
-    if (lg.material) lg.material.emissiveIntensity = 0.75;
+    if (lg.material) lg.material.emissiveIntensity = 0.85;
   }
 
   isExploded = false;
@@ -683,10 +713,6 @@ function resetAllCarriageCustomizations() {
   allCarriageMeshes.forEach((m) => {
     if (m.material) m.material.wireframe = false;
   });
-
-  isDrivingOnRoad = true;
-  btnDriveRoad.classList.add('active');
-  driveRoadLabel.textContent = 'Drive On Road: Active';
 
   swatchItems.forEach((s) => s.classList.remove('active'));
   calloutItems.forEach((c) => c.classList.remove('active'));
@@ -727,6 +753,9 @@ swatchItems.forEach((item) => {
       setViewMode('iso');
     } else {
       item.classList.add('active');
+      if (key === 'glass' && !isRoofCutaway) {
+        setRoofCutawayMode(true);
+      }
       focusOnDetailKey(key);
     }
   });
@@ -746,7 +775,7 @@ calloutItems.forEach((item) => {
   });
 });
 
-// Direct 3D raycast click on carriage doors or windows to open/close them
+// Direct 3D raycast click on Gebyok doors or Krepyak windows to open/close them
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let downPt = { x: 0, y: 0 };
@@ -783,7 +812,6 @@ const svgLeadersLayer = document.getElementById('svg-leaders-layer');
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const CALLOUT_IDS = ['1', '2', '3', '4'];
 
-// Pre-create reusable SVG nodes once (zero innerHTML parsing in the 60fps loop)
 const leaderNodes = {};
 for (const id of CALLOUT_IDS) {
   const polyline = document.createElementNS(SVG_NS, 'polyline');
@@ -874,7 +902,7 @@ function updateSVGAnnotations() {
 }
 
 // =========================================================================
-// 6. RESIZE HANDLER & MAIN SELF-DRIVING / SUSPENSION / RENDER LOOP
+// 6. RESIZE HANDLER & MAIN RENDER / ANIMATION LOOP
 // =========================================================================
 function handleResize() {
   const rect = canvasWrap.getBoundingClientRect();
@@ -916,64 +944,7 @@ function animate() {
     turntableGroup.rotation.y += dt * 0.30;
   }
 
-  // 3. Autonomous Self-Driving on the Feathered Cobblestone Road Patch
-  const speedMult = carriageConfig.driveSpeedMult;
-  const currentSpeed = isDrivingOnRoad ? (BASE_DRIVE_SPEED * speedMult) : 0.0;
-  if (currentSpeed > 0.001) {
-    roadScrollDist += currentSpeed * dt;
-    const uvOffset = roadScrollDist / (PATCH_LENGTH * carriageConfig.lengthScale);
-    roadMapTex.offset.y = uvOffset;
-    roadBumpTex.offset.y = uvOffset;
-
-    const halfRoadSpan = 2.55 * carriageConfig.lengthScale;
-    for (const st of roadStones) {
-      st.z -= currentSpeed * dt;
-      if (st.z < -halfRoadSpan) {
-        st.z += halfRoadSpan * 2.0;
-      }
-      st.mesh.position.set(st.x, 0.005, st.z);
-      const edgeDist = Math.max(0, halfRoadSpan - 0.10 - Math.abs(st.z));
-      st.mesh.material.opacity = Math.min(1.0, edgeDist * 2.2);
-    }
-  }
-
-  // 4. Compute 4-Wheel Independent Stone Climb, Spoked Wheel Spin & Fifth-Wheel Micro-Steer
-  const steerWeave = (isDrivingOnRoad && currentSpeed > 0.01) ? Math.sin(elapsed * 1.15 * Math.max(0.5, speedMult)) * 0.055 : 0.0;
-  const bounceScale = Math.max(0.4, Math.min(1.8, speedMult));
-  for (const key of ['FL', 'FR', 'RL', 'RR']) {
-    const w = wheelRig[key];
-    w.angle += (currentSpeed / w.radius) * dt;
-
-    let targetLift = 0.0;
-    for (const st of roadStones) {
-      if (Math.abs(st.x - w.restPos.x) < 0.28) {
-        const dz = Math.abs(st.z - w.restPos.z);
-        const span = st.radius + 0.20 * carriageConfig.heightScale;
-        if (dz < span) {
-          const q = 1.0 - (dz / span) * (dz / span);
-          targetLift = Math.max(targetLift, st.height * bounceScale * q * Math.sqrt(q));
-        }
-      }
-    }
-    if (isDrivingOnRoad && currentSpeed > 0.01) {
-      targetLift += Math.abs(Math.sin(roadScrollDist * 9.0 + w.restPos.z * 3.0)) * 0.004 * bounceScale;
-    }
-    w.lift += (targetLift - w.lift) * Math.min(1.0, dt * 18.0);
-  }
-
-  // 5. Damped Leaf-Spring Cabin Suspension & Pitch Response
-  const frontLift = 0.5 * (wheelRig.FL.lift + wheelRig.FR.lift);
-  const rearLift = 0.5 * (wheelRig.RL.lift + wheelRig.RR.lift);
-  const avgWheelLift = 0.5 * (frontLift + rearLift);
-
-  const springForce = (avgWheelLift * 0.75 - bodyHeaveY) * 110.0 - bodyHeaveVel * 13.0;
-  bodyHeaveVel += springForce * dt;
-  bodyHeaveY += bodyHeaveVel * dt;
-
-  const dynamicPitch = Math.atan2(rearLift - frontLift, 2.67 * carriageConfig.lengthScale) * 0.65;
-  bodyPitch += (dynamicPitch - bodyPitch) * Math.min(1.0, dt * 10.0);
-
-  // 6. Selective Door Swing, Selective 5-Window Swing & Exploded View Interpolation
+  // 3. Selective Kori Agung Door Swing, Selective 5-Window Swing, Cutaway & Exploded View Interpolation
   const fullDoorRad = THREE.MathUtils.degToRad(targetDoorDeg);
   const tgtDoorL = carriageConfig.activeDoors.left ? fullDoorRad : 0.0;
   const tgtDoorR = carriageConfig.activeDoors.right ? fullDoorRad : 0.0;
@@ -991,58 +962,59 @@ function animate() {
   const targetExplode = isExploded ? 1.0 : 0.0;
   currentExplodeT += (targetExplode - currentExplodeT) * Math.min(1.0, dt * 5.5);
 
-  // Warm Victorian Oil-Lamp Flicker for the Exterior Coach Lanterns & Interior Parlour Lamp
+  const targetCutaway = isRoofCutaway ? 1.0 : 0.0;
+  currentCutawayT += (targetCutaway - currentCutawayT) * Math.min(1.0, dt * 5.5);
+
+  // 4. Warm Javanese Oil-Lamp / Robyong Chandelier Flicker & Gentle Tropical Breeze Sway
   const lMode = carriageConfig.lanternsMode;
+  const breezeMult = carriageConfig.driveSpeedMult * BASE_DRIVE_SPEED;
+  const lanternSwayZ = Math.sin(elapsed * 1.8 * Math.max(0.2, breezeMult)) * 0.025 * breezeMult;
+
   if (isLanternsLit) {
-    const flicker = 1.0 + 0.08 * Math.sin(elapsed * 7.3) + 0.05 * Math.cos(elapsed * 13.7);
+    const flicker = 1.0 + 0.06 * Math.sin(elapsed * 6.5 * Math.max(0.4, breezeMult)) + 0.04 * Math.cos(elapsed * 11.3);
     const baseInt = lanternLightState.baseIntensity;
     interiorGlow.intensity = baseInt * flicker;
-    frontLanternGlow.intensity = (lMode === 'all' || lMode === 'front') ? (baseInt * 0.85 * flicker) : 0.0;
-    rearLanternGlow.intensity = (lMode === 'all') ? (baseInt * 0.85 * flicker) : 0.0;
+    frontLanternGlow.intensity = (lMode === 'all' || lMode === 'front') ? (baseInt * 0.95 * flicker) : 0.0;
+    rearLanternGlow.intensity = (lMode === 'all') ? (baseInt * 0.80 * flicker) : 0.0;
   } else {
     interiorGlow.intensity = 0.0;
     frontLanternGlow.intensity = 0.0;
     rearLanternGlow.intensity = 0.0;
   }
 
-  // Apply transforms to Wheels (including Outward Victorian Wheel Camber)
-  const camberRad = THREE.MathUtils.degToRad(carriageConfig.wheelCamberDeg);
+  // 5. Apply Transforms to 4 Master Umpak Soko Guru Pedestals
   for (const key of ['FL', 'FR', 'RL', 'RR']) {
     const w = wheelRig[key];
-    const yaw = w.isFront ? steerWeave : 0.0;
-    const zTilt = -w.side * camberRad;
     for (const m of w.meshes) {
       m.position
         .copy(m.userData.restPosition)
         .addScaledVector(m.userData.explodeVec, currentExplodeT);
-      m.position.y += w.lift;
-      m.rotation.x = w.angle;
-      m.rotation.y = yaw;
-      m.rotation.z = zTilt;
     }
   }
 
-  // Apply transforms to Undercarriage
-  const stancePitch = kinematicState.stancePitchRad * 0.85;
+  // 6. Apply Transforms to Undak-Undakan Stone Plinth
   for (const m of undercarriageMeshes) {
     m.position
       .copy(m.userData.restPosition)
       .addScaledVector(m.userData.explodeVec, currentExplodeT);
-    m.rotation.x = m.userData.restRotation.x + stancePitch;
   }
 
-  // Apply transforms to Sprung Cabin Body, Roof, Chimney, Interior, Lanterns & Hinged Doors/Windows
-  const totalBodyPitch = stancePitch + bodyPitch;
+  // 7. Apply Transforms to Sprung Joglo Pavilion, Roof, Tumpang Sari, Lanterns & Hinged Doors/Windows
   for (const m of sprungBodyMeshes) {
     m.position
       .copy(m.userData.restPosition)
       .addScaledVector(m.userData.explodeVec, currentExplodeT);
-    m.position.y += bodyHeaveY;
-    if (!m.name.startsWith('Window_Front_')) {
-      m.rotation.x = m.userData.restRotation.x + totalBodyPitch;
+    if (m.name.startsWith('Roof_') || m.name.startsWith('Chimney_')) {
+      m.position.y += currentCutawayT * 0.68;
     }
   }
 
+  // Gentle breeze sway on hanging Pendopo Chandeliers
+  for (const m of [...frontLanternMeshes, ...rearLanternMeshes]) {
+    m.rotation.z = m.userData.restRotation.z + lanternSwayZ;
+  }
+
+  // Hinged Central Kori Agung Double Doors
   for (const m of leftDoorMeshes) {
     m.rotation.y = m.userData.restRotation.y - currentDoorLeftRad;
   }
@@ -1050,45 +1022,25 @@ function animate() {
     m.rotation.y = m.userData.restRotation.y + currentDoorRightRad;
   }
 
-  // Upper Pointed Gothic Arch Door Casement Windows (orbit with their door hinge + swing on their own sash hinge)
+  // Front Left & Right Gebyok Casement Windows
   for (const m of leftDoorWindowMeshes) {
-    const doorYaw = -currentDoorLeftRad;
-    if (m.userData.doorRestHinge) {
-      const dh = m.userData.doorRestHinge;
-      const dx = m.userData.restPosition.x - dh.x;
-      const dz = m.userData.restPosition.z - dh.z;
-      const cosD = Math.cos(doorYaw);
-      const sinD = Math.sin(doorYaw);
-      m.position.x = dh.x + dx * cosD + dz * sinD + m.userData.explodeVec.x * currentExplodeT;
-      m.position.z = dh.z - dx * sinD + dz * cosD + m.userData.explodeVec.z * currentExplodeT;
-    }
-    m.rotation.y = m.userData.restRotation.y + doorYaw - currentWinSideRad * 0.95;
+    m.rotation.y = m.userData.restRotation.y - currentWinSideRad * 0.90;
   }
   for (const m of rightDoorWindowMeshes) {
-    const doorYaw = currentDoorRightRad;
-    if (m.userData.doorRestHinge) {
-      const dh = m.userData.doorRestHinge;
-      const dx = m.userData.restPosition.x - dh.x;
-      const dz = m.userData.restPosition.z - dh.z;
-      const cosD = Math.cos(doorYaw);
-      const sinD = Math.sin(doorYaw);
-      m.position.x = dh.x + dx * cosD + dz * sinD + m.userData.explodeVec.x * currentExplodeT;
-      m.position.z = dh.z - dx * sinD + dz * cosD + m.userData.explodeVec.z * currentExplodeT;
-    }
-    m.rotation.y = m.userData.restRotation.y + doorYaw + currentWinSideRad * 0.95;
+    m.rotation.y = m.userData.restRotation.y + currentWinSideRad * 0.90;
   }
 
-  // Front Balcony Top-Hinged Gothic Awning Window (tilts outward over the front balustrade)
+  // Central Upper Transom Awning Window
   for (const m of frontWindowMeshes) {
-    m.rotation.x = m.userData.restRotation.x + totalBodyPitch - currentWinFrontRad * 0.85;
+    m.rotation.x = m.userData.restRotation.x - currentWinFrontRad * 0.85;
   }
 
-  // Twin Rear French Casement Windows (swing outward from center mullion)
+  // Side Sanctuary Krepyak Windows
   for (const m of rearLeftWindowMeshes) {
-    m.rotation.y = m.userData.restRotation.y + currentWinRearRad;
+    m.rotation.y = m.userData.restRotation.y + currentWinRearRad * 0.90;
   }
   for (const m of rearRightWindowMeshes) {
-    m.rotation.y = m.userData.restRotation.y - currentWinRearRad;
+    m.rotation.y = m.userData.restRotation.y - currentWinRearRad * 0.90;
   }
 
   controls.update();

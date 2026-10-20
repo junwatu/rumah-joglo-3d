@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Obsidian Dynamics — Gothic Victorian Carriage (GVC-001)</title>
+  <title>Keraton Nusantara — Rumah Joglo Jawa (RJ-001)</title>
 
-  <!-- Google Fonts matching Victorian Serif + Architectural Monospace -->
+  <!-- Google Fonts matching Heritage Serif + Architectural Monospace -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -44,7 +44,7 @@
     <svg class="corner-ornament bl" viewBox="0 0 20 20"><path d="M1,19 L1,1 L19,1 M5,1 L5,5 L1,5" fill="none" stroke="#6c5d4f" stroke-width="1.2"/><rect x="2.5" y="2.5" width="2" height="2" fill="#3f2835"/></svg>
     <svg class="corner-ornament br" viewBox="0 0 20 20"><path d="M1,19 L1,1 L19,1 M5,1 L5,5 L1,5" fill="none" stroke="#6c5d4f" stroke-width="1.2"/><rect x="2.5" y="2.5" width="2" height="2" fill="#3f2835"/></svg>
 
-    <!-- 4 Midpoint Gothic Diamond Finials -->
+    <!-- 4 Midpoint Javanese Diamond Finials -->
     <div class="edge-finial top">
       <svg width="36" height="20" viewBox="0 0 36 20">
         <circle cx="4" cy="10" r="1.3" fill="#6c5d4f"/>
@@ -93,8 +93,8 @@
             <circle cx="16" cy="16" r="1.6" fill="#e8dfd1"/>
           </svg>
           <div class="brand-text-wrap">
-            <span class="brand-name">Obsidian Dynamics</span>
-            <span class="brand-sub">Heritage Vehicle Division</span>
+            <span class="brand-name">Keraton Nusantara</span>
+            <span class="brand-sub">Javanese Architecture Division</span>
           </div>
         </div>
 
@@ -109,63 +109,62 @@
           <circle cx="152" cy="7" r="1.5" fill="#8c7d6c"/>
         </svg>
 
-        <!-- Main Gothic Victorian Carriage Title -->
+        <!-- Main Rumah Joglo Title -->
         <h1 class="hero-title">
-          <span class="line-1"><span class="init-cap">G</span>OTHIC</span>
-          <span class="line-2"><span class="init-cap">V</span>ICTORIAN</span>
-          <span class="line-3"><span class="init-cap">C</span>ARRIAGE</span>
+          <span class="line-1"><span class="init-cap">R</span>UMAH</span>
+          <span class="line-2"><span class="init-cap">J</span>OGLO</span>
+          <span class="line-3"><span class="init-cap">J</span>AWA</span>
         </h1>
 
-        <div class="subtitle-banner">Interactive 3D Model</div>
+        <div class="subtitle-banner">Interactive 3D Architecture</div>
 
         <p class="hero-desc">
-          A meticulously crafted gothic Victorian carriage. Explore the model in real time, inspect the details, and experience its craftsmanship from every angle.
+          A sacred Javanese Joglo ensemble featuring the open <em>Pendopo</em>, four master <em>Soko Guru</em> teak columns, stepped <em>Tumpang Sari</em> ceiling, and carved <em>Gebyok</em> sanctuary.
         </p>
       </div>
 
-      <!-- 2. MIDDLE INTERACTIVE GROUP: EXPLORE THE MODEL + VIEW MODE (KEPT CLOSE TOGETHER) -->
+      <!-- 2. MIDDLE INTERACTIVE GROUP: EXPLORE THE MODEL + VIEW MODE -->
       <div class="left-explore-group">
-        <!-- EXPLORE THE MODEL (SELF-DRIVE + 3x2 GRID) -->
         <div class="arch-box">
           <div class="box-header">
             <div class="box-header-left">
               <span class="diamond-bullet">&#10022;</span>
-              <span>Explore The Model</span>
+              <span>Explore The Pavilion</span>
             </div>
+            <button class="reset-btn" id="btn-export-glb" title="Download 3D Rumah Joglo as .GLB file">
+              &#8681; .GLB
+            </button>
           </div>
 
-          <!-- Autonomous Cobblestone Road Drive Toggle (Active by default) -->
-          <button class="drive-road-btn active" id="btn-drive-road" title="Toggle Autonomous Driving on the Cobblestone Road">
+          <!-- Tumpang Sari Roof Cutaway Toggle -->
+          <button class="drive-road-btn" id="btn-drive-road" title="Ghost &amp; Lift the Roof to Inspect the Stepped Tumpang Sari Ceiling">
             <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="8.5"/>
-              <circle cx="12" cy="12" r="2.2"/>
-              <line x1="12" y1="3.5" x2="12" y2="9.8"/>
-              <line x1="12" y1="14.2" x2="12" y2="20.5"/>
-              <line x1="3.5" y1="12" x2="9.8" y2="12"/>
-              <line x1="14.2" y1="12" x2="20.5" y2="12"/>
+              <polygon points="12,3 22,10 2,10"/>
+              <rect x="5" y="11" width="14" height="3"/>
+              <rect x="7" y="15" width="10" height="3"/>
             </svg>
-            <span id="drive-road-label">Drive On Road: Active</span>
+            <span id="drive-road-label">Inspect Tumpang Sari Ceiling</span>
           </button>
 
           <div class="explore-grid">
-            <button class="action-btn" id="btn-door" title="Open / Close Hinged Gothic Side Doors">
+            <button class="action-btn" id="btn-door" title="Open / Close Carved Gebyok Kori Agung Doors">
               <svg viewBox="0 0 28 28">
                 <rect x="6" y="4" width="14" height="20" stroke-opacity="0.45"/>
                 <polygon points="6,4 16,2 16,26 6,24" fill="rgba(158,144,127,0.15)"/>
                 <circle cx="13.5" cy="14" r="1"/>
                 <path d="M 17,22 A 7,3 0 0,0 22,19" stroke-dasharray="2 1.5"/>
               </svg>
-              <span>Open Door</span>
+              <span>Gebyok Doors</span>
             </button>
 
-            <button class="action-btn" id="btn-window" title="Open / Close 5 Articulated Gothic Casement &amp; Awning Windows">
+            <button class="action-btn" id="btn-window" title="Open / Close 5 Carved Krepyak &amp; Stained-Glass Windows">
               <svg viewBox="0 0 28 28">
                 <path d="M 6,23 L 6,12 Q 6,4 14,3 Q 22,4 22,12 L 22,23 Z"/>
                 <line x1="14" y1="3" x2="14" y2="23"/>
                 <polygon points="14,10 21,8 21,21 14,23" fill="rgba(158,144,127,0.22)"/>
                 <path d="M 18,22 A 6,3 0 0,0 24,19" stroke-dasharray="2 1.5"/>
               </svg>
-              <span>Open Window</span>
+              <span>Krepyak Windows</span>
             </button>
 
             <button class="action-btn" id="btn-rotate" title="Rotate 360° Turntable">
@@ -175,10 +174,10 @@
                 <path d="M 22,17 A 9,6 0 1,1 6,17" stroke-linecap="round"/>
                 <polyline points="8,21 5.5,16.5 10,15.5"/>
               </svg>
-              <span>Rotate Model</span>
+              <span>Rotate 360&deg;</span>
             </button>
 
-            <button class="action-btn" id="btn-wireframe" title="Toggle 3D Mesh Wireframe">
+            <button class="action-btn" id="btn-wireframe" title="Toggle 3D Architectural Wireframe">
               <svg viewBox="0 0 28 28">
                 <polygon points="14,3 24,8.5 24,19.5 14,25 4,19.5 4,8.5"/>
                 <polyline points="4,8.5 14,14 24,8.5"/>
@@ -188,7 +187,7 @@
               <span>Wireframe</span>
             </button>
 
-            <button class="action-btn active" id="btn-lanterns" title="Toggle 4 Exterior Gothic Coach Lanterns &amp; Interior Parlour Lamp Glow">
+            <button class="action-btn active" id="btn-lanterns" title="Toggle Pendopo Lampu Robyong Chandelier &amp; Sanctuary Glow">
               <svg viewBox="0 0 28 28">
                 <polygon points="11,8 17,8 19,19 9,19"/>
                 <polygon points="9,8 14,4 19,8"/>
@@ -196,10 +195,10 @@
                 <polygon points="11,19 17,19 14,24"/>
                 <circle cx="14" cy="14" r="2.2" fill="currentColor"/>
               </svg>
-              <span>Coach Lanterns</span>
+              <span>Lampu Robyong</span>
             </button>
 
-            <button class="action-btn" id="btn-exploded" title="Toggle Architectural Exploded View">
+            <button class="action-btn" id="btn-exploded" title="Toggle Architectural Exploded Structural View">
               <svg viewBox="0 0 28 28">
                 <polygon points="14,2 19,4.8 14,7.6 9,4.8"/>
                 <polyline points="9,4.8 9,9.5 14,12.2 19,9.5 19,4.8"/>
@@ -245,43 +244,43 @@
 
       <!-- 3. BOTTOM DOCK: BESPOKE ATELIER LAUNCHER + MODEL INFO SPECS TABLE -->
       <div class="left-bottom-group">
-        <!-- BESPOKE ATELIER LAUNCHER CARD WITH 1-CLICK DESIGNER THEMES -->
+        <!-- BESPOKE ATELIER LAUNCHER CARD WITH 1-CLICK JAVANESE THEMES -->
         <div class="arch-box">
           <div class="box-header">
             <div class="box-header-left">
               <span class="diamond-bullet">&#10022;</span>
-              <span>Bespoke Atelier</span>
+              <span>Joglo Atelier</span>
             </div>
-            <button class="reset-btn" id="btn-reset-custom" title="Reset All Finishes, Dimensions, Wheels & Trim to Default">
+            <button class="reset-btn" id="btn-reset-custom" title="Reset All Finishes, Proportions, Columns &amp; Gebyok to Default">
               &#8634; Reset
             </button>
           </div>
 
           <div class="preset-grid" id="atelier-preset-grid">
-            <button class="preset-chip active" data-preset="heritage" title="Original Victorian Heritage Teal & Plum">
-              <span class="preset-dot" style="background: linear-gradient(135deg, #4b8288 50%, #6d3754 50%);"></span>
-              <span>Heritage</span>
+            <button class="preset-chip active" data-preset="heritage" title="Keraton Surakarta — Aged Jati Teak, Terracotta Genteng &amp; Prada Gold">
+              <span class="preset-dot" style="background: linear-gradient(135deg, #6e472b 50%, #9e472f 50%);"></span>
+              <span>Keraton Solo</span>
             </button>
-            <button class="preset-chip" data-preset="midnight" title="Obsidian Ebony, Crimson Glass & Sterling Iron">
-              <span class="preset-dot" style="background: linear-gradient(135deg, #222528 50%, #b81d38 50%);"></span>
-              <span>Midnight</span>
+            <button class="preset-chip" data-preset="midnight" title="Majapahit Klasik — Dark Sono Rosewood, Ironwood Sirap &amp; Bronze">
+              <span class="preset-dot" style="background: linear-gradient(135deg, #382820 50%, #333538 50%);"></span>
+              <span>Majapahit</span>
             </button>
-            <button class="preset-chip" data-preset="imperial" title="Royal Crimson, Gilded Ochre & Polished Brass">
-              <span class="preset-dot" style="background: linear-gradient(135deg, #7a2834 50%, #d9a84e 50%);"></span>
-              <span>Imperial</span>
+            <button class="preset-chip" data-preset="imperial" title="Pakualaman Royal — Honey Teak, Glazed Ochre Roof &amp; 24K Prada">
+              <span class="preset-dot" style="background: linear-gradient(135deg, #b88b58 50%, #ebc054 50%);"></span>
+              <span>Pakualaman</span>
             </button>
-            <button class="preset-chip" data-preset="wraith" title="Forest Absinthe, Verdigris Bronze & Spectral Glass">
-              <span class="preset-dot" style="background: linear-gradient(135deg, #315c45 50%, #3ad9c6 50%);"></span>
-              <span>Absinthe</span>
+            <button class="preset-chip" data-preset="wraith" title="Pesisir Kudus — Coastal Patina Teak, Verdigris Tiles &amp; Indigo Batik">
+              <span class="preset-dot" style="background: linear-gradient(135deg, #4b5d46 50%, #3f6e66 50%);"></span>
+              <span>Pesisir Kudus</span>
             </button>
           </div>
 
           <div class="atelier-launcher-summary" id="atelier-summary-text">
-            Heritage Teal &bull; 12-Spoke &bull; 4 860 &times; 2 140 &times; 3 200 MM
+            Jati Keraton &bull; Umpak Padma &bull; 11 400 &times; 9 800 &times; 7 600 MM
           </div>
 
-          <button class="atelier-open-btn active" id="btn-toggle-atelier" title="Open / Minimize Bottom Carriage Configurator">
-            <span>&#10022; Fine-Tune Coach</span>
+          <button class="atelier-open-btn active" id="btn-toggle-atelier" title="Open / Minimize Bottom Rumah Joglo Configurator">
+            <span>&#10022; Customize Joglo</span>
           </button>
         </div>
 
@@ -289,15 +288,15 @@
         <div class="specs-table">
           <div class="spec-row">
             <span class="spec-key">Model</span>
-            <span class="spec-val">GVC-001</span>
+            <span class="spec-val">RJ-001 (JOGLO)</span>
           </div>
           <div class="spec-row">
-            <span class="spec-key">Polygons</span>
-            <span class="spec-val">1,284,560</span>
+            <span class="spec-key">Structure</span>
+            <span class="spec-val">4 Soko Guru + 12</span>
           </div>
           <div class="spec-row">
-            <span class="spec-key">Textures</span>
-            <span class="spec-val">4K PBR</span>
+            <span class="spec-key">Joinery</span>
+            <span class="spec-val">Tumpang Sari 8-Tier</span>
           </div>
           <div class="spec-row">
             <span class="spec-key">Units</span>
@@ -308,10 +307,10 @@
     </section>
 
     <!-- =====================================================================
-         CENTER STAGE: 3D MODEL, COBBLESTONE ROAD, 4 CALLOUTS & FLOATING DOCK
+         CENTER STAGE: 3D RUMAH JOGLO, COURTYARD, 4 CALLOUTS & FLOATING DOCK
          ===================================================================== -->
     <section class="col-center" id="center-stage">
-      <div id="loading-banner">Loading 3D Heritage Model&hellip;</div>
+      <div id="loading-banner">Constructing 3D Rumah Joglo&hellip;</div>
 
       <div id="carriage-canvas-wrap">
         <canvas id="carriage-canvas"></canvas>
@@ -332,52 +331,52 @@
         <g id="svg-leaders-layer"></g>
       </svg>
 
-      <!-- 4 CLEAN, WELL-SPACED ARCHITECTURAL CARRIAGE CALLOUTS (2 LEFT, 2 RIGHT) -->
+      <!-- 4 ARCHITECTURAL JOGLO CALLOUTS (2 LEFT, 2 RIGHT) -->
       <div class="callout-item" id="callout-1" data-callout="1">
         <div class="callout-badge">1</div>
         <div class="callout-text">
-          <h4>Ornate Roof &amp; Finials</h4>
-          <p>Arched barrel vault with forged gothic spires &amp; stove chimney.</p>
+          <h4>Atap Brunjung &amp; Mustaka</h4>
+          <p>Soaring trapezoidal terracotta roof crowned with a royal <em>Mustaka</em> finial.</p>
         </div>
       </div>
 
       <div class="callout-item" id="callout-2" data-callout="2">
         <div class="callout-badge">2</div>
         <div class="callout-text">
-          <h4>Front Porch &amp; Lanterns</h4>
-          <p>Turned balustrade balcony with awning window &amp; oil coach lamps.</p>
+          <h4>Soko Guru &amp; Tumpang Sari</h4>
+          <p>Four master teak columns carrying the 8-tier stepped corbeled ceiling.</p>
         </div>
       </div>
 
       <div class="callout-item" id="callout-3" data-callout="3">
         <div class="callout-badge">3</div>
         <div class="callout-text">
-          <h4>Gothic Casement &amp; Skull</h4>
-          <p>Hinged doors with pointed-arch leaded glass &amp; skull medallions.</p>
+          <h4>Gebyok Ukir &amp; Kori Agung</h4>
+          <p>Hand-carved teak partition wall with <em>Gunungan</em> crest &amp; hinged double doors.</p>
         </div>
       </div>
 
       <div class="callout-item" id="callout-4" data-callout="4">
         <div class="callout-badge">4</div>
         <div class="callout-text">
-          <h4>Leaf-Spring Undercarriage</h4>
-          <p>12-spoke iron-tired wheels on elliptical springs &amp; fifth-wheel steer.</p>
+          <h4>Umpak Batu &amp; Pendopo</h4>
+          <p>Carved black andesite column pedestals resting on the stepped stone plinth.</p>
         </div>
       </div>
 
-      <!-- FLOATING BOTTOM ARCHITECTURAL CONFIGURATOR DOCK (REFINED UX) -->
+      <!-- FLOATING BOTTOM ARCHITECTURAL CONFIGURATOR DOCK -->
       <div class="atelier-dock" id="atelier-dock">
         <div class="atelier-dock-bar">
-          <div class="atelier-dock-title" id="atelier-dock-header-toggle" title="Click to Expand or Minimize Coach Configurator">
+          <div class="atelier-dock-title" id="atelier-dock-header-toggle" title="Click to Expand or Minimize Joglo Configurator">
             <span class="diamond-bullet">&#10022;</span>
-            <span id="atelier-dock-title-label">Coach Atelier</span>
+            <span id="atelier-dock-title-label">Joglo Atelier</span>
           </div>
 
           <div class="atelier-tabs-row">
-            <button class="atelier-tab-btn active" data-tab="finishes">Finishes &amp; Colors</button>
-            <button class="atelier-tab-btn" data-tab="proportions">Size &amp; Shape</button>
-            <button class="atelier-tab-btn" data-tab="wheels">Wheels &amp; Stance</button>
-            <button class="atelier-tab-btn" data-tab="trim">Doors &amp; Trim</button>
+            <button class="atelier-tab-btn active" data-tab="finishes">Finishes &amp; Woods</button>
+            <button class="atelier-tab-btn" data-tab="proportions">Size &amp; Roof Pitch</button>
+            <button class="atelier-tab-btn" data-tab="wheels">Columns &amp; Umpak</button>
+            <button class="atelier-tab-btn" data-tab="trim">Gebyok &amp; Trim</button>
           </div>
 
           <div class="atelier-dock-actions">
@@ -387,246 +386,246 @@
         </div>
 
         <div class="atelier-dock-body">
-          <!-- TAB 1: FINISHES, GLASS TINT & INTERIOR UPHOLSTERY -->
+          <!-- TAB 1: JAVANESE WOODS, ROOF TILES, UMPAK STONE & PRADA GOLD -->
           <div class="atelier-tab-pane active" data-pane="finishes">
             <div class="atelier-subcard">
               <div class="subcard-head">
-                <span class="subcard-title">Exterior Finishes</span>
+                <span class="subcard-title">Architectural Timber &amp; Roof</span>
                 <span class="subcard-hint">Click swatch to apply</span>
               </div>
 
               <div class="custom-row">
                 <div class="custom-label-stack">
-                  <span class="custom-label">Body Wood</span>
-                  <span class="custom-subval" id="subval-timber">Heritage Teal</span>
+                  <span class="custom-label">Kayu Jati</span>
+                  <span class="custom-subval" id="subval-timber">Jati Keraton</span>
                 </div>
                 <div class="color-pills" data-group="timber">
-                  <button class="color-pill active" data-val="default" data-name="Heritage Teal" style="background: linear-gradient(135deg, #4b8288, #2b5056);" title="Heritage Teal (Default)"></button>
-                  <button class="color-pill" data-val="ebony" data-name="Obsidian Ebony" style="background: linear-gradient(135deg, #2d3033, #141618);" title="Obsidian Ebony"></button>
-                  <button class="color-pill" data-val="crimson" data-name="Royal Crimson" style="background: linear-gradient(135deg, #7a2834, #3d1118);" title="Royal Crimson"></button>
-                  <button class="color-pill" data-val="emerald" data-name="Forest Absinthe" style="background: linear-gradient(135deg, #356348, #193624);" title="Forest Absinthe"></button>
-                  <button class="color-pill" data-val="ivory" data-name="Antique Alabaster" style="background: linear-gradient(135deg, #d8cbb8, #9c8e7b);" title="Antique Alabaster"></button>
+                  <button class="color-pill active" data-val="default" data-name="Jati Keraton" style="background: linear-gradient(135deg, #7d5233, #4a2d18);" title="Aged Jati Keraton Teak (Default)"></button>
+                  <button class="color-pill" data-val="ebony" data-name="Sono Keling" style="background: linear-gradient(135deg, #3d2c22, #1c130e);" title="Dark Javanese Sono Keling Rosewood"></button>
+                  <button class="color-pill" data-val="crimson" data-name="Politur Mahoni" style="background: linear-gradient(135deg, #873626, #47180f);" title="Reddish Royal Mahogany Polish"></button>
+                  <button class="color-pill" data-val="emerald" data-name="Jati Pesisir" style="background: linear-gradient(135deg, #54664e, #293625);" title="Weathered Coastal Teak Patina"></button>
+                  <button class="color-pill" data-val="ivory" data-name="Jati Emas" style="background: linear-gradient(135deg, #c29560, #855f32);" title="Golden Honey Teak"></button>
                 </div>
               </div>
 
               <div class="custom-row">
                 <div class="custom-label-stack">
-                  <span class="custom-label">Wheels &amp; Frame</span>
-                  <span class="custom-subval" id="subval-wheels">Victorian Plum</span>
+                  <span class="custom-label">Genteng Atap</span>
+                  <span class="custom-subval" id="subval-wheels">Terakota Soka</span>
                 </div>
                 <div class="color-pills" data-group="wheels">
-                  <button class="color-pill active" data-val="default" data-name="Victorian Plum" style="background: linear-gradient(135deg, #6d3754, #3d1b2d);" title="Victorian Plum (Default)"></button>
-                  <button class="color-pill" data-val="ochre" data-name="Gilded Ochre" style="background: linear-gradient(135deg, #b8873d, #6e4c1b);" title="Gilded Ochre"></button>
-                  <button class="color-pill" data-val="oxblood" data-name="Oxblood Mahogany" style="background: linear-gradient(135deg, #822626, #421111);" title="Oxblood Mahogany"></button>
-                  <button class="color-pill" data-val="charcoal" data-name="Smoked Ash" style="background: linear-gradient(135deg, #383536, #1b191a);" title="Smoked Ash"></button>
-                  <button class="color-pill" data-val="teal" data-name="Matched Teal" style="background: linear-gradient(135deg, #457a80, #23474b);" title="Matched Teal"></button>
+                  <button class="color-pill active" data-val="default" data-name="Terakota Soka" style="background: linear-gradient(135deg, #9e472f, #5c2416);" title="Traditional Soka Clay Roof Tiles (Default)"></button>
+                  <button class="color-pill" data-val="ochre" data-name="Ochre Keraton" style="background: linear-gradient(135deg, #bf8036, #704615);" title="Glazed Royal Ochre Roof Tiles"></button>
+                  <button class="color-pill" data-val="oxblood" data-name="Bata Majapahit" style="background: linear-gradient(135deg, #822820, #42110c);" title="Deep Majapahit Red Terracotta"></button>
+                  <button class="color-pill" data-val="charcoal" data-name="Sirap Ulin" style="background: linear-gradient(135deg, #3b3d40, #1c1d1f);" title="Dark Ironwood Shingles (Sirap Kayu Ulin)"></button>
+                  <button class="color-pill" data-val="teal" data-name="Patina Tembaga" style="background: linear-gradient(135deg, #42736b, #20403b);" title="Verdigris Patina Roof Tiles"></button>
                 </div>
               </div>
 
               <div class="custom-row">
                 <div class="custom-label-stack">
-                  <span class="custom-label">Metalwork</span>
-                  <span class="custom-subval" id="subval-metal">Forged Iron</span>
+                  <span class="custom-label">Batu Umpak</span>
+                  <span class="custom-subval" id="subval-metal">Andesit Candi</span>
                 </div>
                 <div class="color-pills" data-group="metal">
-                  <button class="color-pill active" data-val="default" data-name="Forged Iron" style="background: linear-gradient(135deg, #4a5058, #22262b);" title="Blackened Forged Iron (Default)"></button>
-                  <button class="color-pill" data-val="brass" data-name="Polished Brass" style="background: linear-gradient(135deg, #d4a650, #7d5b1e);" title="Polished Brass & Gold"></button>
-                  <button class="color-pill" data-val="silver" data-name="Sterling Silver" style="background: linear-gradient(135deg, #b8c2c9, #646d75);" title="Sterling Pewter"></button>
-                  <button class="color-pill" data-val="verdigris" data-name="Verdigris Bronze" style="background: linear-gradient(135deg, #4f8c7c, #2d4f46);" title="Verdigris Patina Bronze"></button>
+                  <button class="color-pill active" data-val="default" data-name="Andesit Candi" style="background: linear-gradient(135deg, #4a4c50, #232528);" title="Volcanic Black Temple Andesite (Default)"></button>
+                  <button class="color-pill" data-val="brass" data-name="Batu Paras" style="background: linear-gradient(135deg, #ab9476, #6e5c44);" title="Jogja Warm Cream Sandstone (Batu Paras)"></button>
+                  <button class="color-pill" data-val="silver" data-name="Batu Kali" style="background: linear-gradient(135deg, #788085, #454b4f);" title="Grey River Andesite"></button>
+                  <button class="color-pill" data-val="verdigris" data-name="Candi Lumut" style="background: linear-gradient(135deg, #43574d, #233029);" title="Mossy Highland Temple Stone"></button>
                 </div>
               </div>
             </div>
 
             <div class="atelier-subcard">
               <div class="subcard-head">
-                <span class="subcard-title">Glass, Interior &amp; Emblems</span>
+                <span class="subcard-title">Glass, Sanctuary &amp; Prada Gilding</span>
                 <span class="subcard-hint">Live PBR Materials</span>
               </div>
 
               <div class="custom-row">
                 <div class="custom-label-stack">
-                  <span class="custom-label">Window Glass</span>
-                  <span class="custom-subval" id="subval-glass_tint">Smoked Onyx</span>
+                  <span class="custom-label">Kaca Patri</span>
+                  <span class="custom-subval" id="subval-glass_tint">Kuning Sogan</span>
                 </div>
                 <div class="color-pills" data-group="glass_tint">
-                  <button class="color-pill active" data-val="default" data-name="Smoked Onyx" style="background: linear-gradient(135deg, #2d383e, #12181c);" title="Smoked Onyx Leaded Glass (Default)"></button>
-                  <button class="color-pill" data-val="amber" data-name="Warm Amber" style="background: linear-gradient(135deg, #ffb84d, #995412);" title="Cathedral Warm Amber"></button>
-                  <button class="color-pill" data-val="ruby" data-name="Crimson Ruby" style="background: linear-gradient(135deg, #cf2942, #630c1a);" title="Gothic Crimson Ruby"></button>
-                  <button class="color-pill" data-val="spectral" data-name="Spectral Teal" style="background: linear-gradient(135deg, #3ad9c6, #126359);" title="Spectral Absinthe Teal"></button>
-                  <button class="color-pill" data-val="crystal" data-name="Crystal Clear" style="background: linear-gradient(135deg, #eef5f7, #9bb0b8);" title="Crystal Clear Parlour Glass"></button>
+                  <button class="color-pill active" data-val="default" data-name="Kuning Sogan" style="background: linear-gradient(135deg, #ffb347, #8c4810);" title="Warm Sogan Amber Stained Glass (Default)"></button>
+                  <button class="color-pill" data-val="amber" data-name="Emas Surya" style="background: linear-gradient(135deg, #ffc45c, #995412);" title="Radiant Sun Gold Stained Glass"></button>
+                  <button class="color-pill" data-val="ruby" data-name="Mirah Delima" style="background: linear-gradient(135deg, #cf2942, #630c1a);" title="Royal Ruby Stained Glass"></button>
+                  <button class="color-pill" data-val="spectral" data-name="Giok Hijau" style="background: linear-gradient(135deg, #3ad9c6, #126359);" title="Emerald Jade Glass"></button>
+                  <button class="color-pill" data-val="crystal" data-name="Kaca Bening" style="background: linear-gradient(135deg, #eef5f7, #9bb0b8);" title="Clear Colonial Pavilion Glass"></button>
                 </div>
               </div>
 
               <div class="custom-row">
                 <div class="custom-label-stack">
-                  <span class="custom-label">Cabin Seating</span>
-                  <span class="custom-subval" id="subval-upholstery">Plum Velvet</span>
+                  <span class="custom-label">Lantai &amp; Senthong</span>
+                  <span class="custom-subval" id="subval-upholstery">Cinde Kraton</span>
                 </div>
                 <div class="color-pills" data-group="upholstery">
-                  <button class="color-pill active" data-val="default" data-name="Plum Velvet" style="background: linear-gradient(135deg, #6d3754, #361828);" title="Victorian Plum Velvet (Default)"></button>
-                  <button class="color-pill" data-val="oxblood" data-name="Oxblood Velvet" style="background: linear-gradient(135deg, #8f1d2c, #420911);" title="Royal Oxblood Velvet"></button>
-                  <button class="color-pill" data-val="tan" data-name="Saddle Leather" style="background: linear-gradient(135deg, #b57c43, #66411c);" title="Chesterfield Saddle Leather"></button>
-                  <button class="color-pill" data-val="emerald" data-name="Emerald Velvet" style="background: linear-gradient(135deg, #2b664c, #123324);" title="Absinthe Emerald Velvet"></button>
-                  <button class="color-pill" data-val="ebony" data-name="Midnight Ebony" style="background: linear-gradient(135deg, #2e2c30, #121114);" title="Midnight Tufted Ebony"></button>
+                  <button class="color-pill active" data-val="default" data-name="Cinde Kraton" style="background: linear-gradient(135deg, #8c2d29, #471412);" title="Royal Cinde Silk &amp; Terracotta Tegel (Default)"></button>
+                  <button class="color-pill" data-val="oxblood" data-name="Merah Gula" style="background: linear-gradient(135deg, #941e28, #420911);" title="Deep Crimson Sanctuary Silk"></button>
+                  <button class="color-pill" data-val="tan" data-name="Batik Sogan" style="background: linear-gradient(135deg, #b07a42, #613f1b);" title="Warm Solo Batik Sogan"></button>
+                  <button class="color-pill" data-val="emerald" data-name="Gadung Mlathi" style="background: linear-gradient(135deg, #2b664c, #123324);" title="Sacred Pandan Green (Gadung Mlathi)"></button>
+                  <button class="color-pill" data-val="ebony" data-name="Nila Pesisir" style="background: linear-gradient(135deg, #2e384f, #141926);" title="Deep Coastal Indigo Batik"></button>
                 </div>
               </div>
 
               <div class="custom-row">
                 <div class="custom-label-stack">
-                  <span class="custom-label">Emblem Finish</span>
-                  <span class="custom-subval" id="subval-skulls">Aged Bone</span>
+                  <span class="custom-label">Prada &amp; Ukir</span>
+                  <span class="custom-subval" id="subval-skulls">Prada Emas</span>
                 </div>
                 <div class="color-pills" data-group="skulls">
-                  <button class="color-pill active" data-val="default" data-name="Aged Bone" style="background: linear-gradient(135deg, #d9ccb2, #7a6e5d);" title="Aged Bone (Default)"></button>
-                  <button class="color-pill" data-val="gold_amber" data-name="Gilded Gold" style="background: linear-gradient(135deg, #f0be59, #9c6c19);" title="Gilded Gold"></button>
-                  <button class="color-pill" data-val="obsidian_ruby" data-name="Obsidian Dark" style="background: linear-gradient(135deg, #2e2a2d, #141214);" title="Obsidian Dark"></button>
-                  <button class="color-pill" data-val="bronze_teal" data-name="Antique Bronze" style="background: linear-gradient(135deg, #a67c46, #523b1e);" title="Antique Bronze"></button>
+                  <button class="color-pill active" data-val="default" data-name="Prada Emas" style="background: linear-gradient(135deg, #deb050, #876118);" title="Traditional Prada Gold Leaf (Default)"></button>
+                  <button class="color-pill" data-val="gold_amber" data-name="Emas Murni" style="background: linear-gradient(135deg, #f5c65d, #9c6c19);" title="Bright 24K Royal Gold"></button>
+                  <button class="color-pill" data-val="obsidian_ruby" data-name="Perunggu Kuno" style="background: linear-gradient(135deg, #473630, #1f1714);" title="Aged Majapahit Dark Bronze"></button>
+                  <button class="color-pill" data-val="bronze_teal" data-name="Kuningan Sari" style="background: linear-gradient(135deg, #b07c46, #593c1e);" title="Burnished Kota Gede Brass"></button>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- TAB 2: SIZE, PROPORTIONS, ROOF VAULT CROWN & SUSPENSION LIFT -->
+          <!-- TAB 2: OVERALL DIMENSIONS, BRUNJUNG ROOF PITCH & PLINTH HEIGHT -->
           <div class="atelier-tab-pane" data-pane="proportions">
             <div class="atelier-subcard">
               <div class="subcard-head">
-                <span class="subcard-title">Overall Dimensions</span>
+                <span class="subcard-title">Pavilion Footprint &amp; Height</span>
                 <span class="subcard-hint">Click value badge to reset</span>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Carriage Length</span>
+                <span class="custom-label">Joglo Depth (L)</span>
                 <div class="dim-slider-wrap">
                   <input type="range" class="dim-slider" id="slider-dim-length" min="0.78" max="1.28" step="0.01" value="1.00" data-default="1.00" />
-                  <span class="dim-val-badge" id="val-dim-length" data-reset-slider="slider-dim-length" title="Click to reset Length">4 860 MM</span>
+                  <span class="dim-val-badge" id="val-dim-length" data-reset-slider="slider-dim-length" title="Click to reset Depth">11 400 MM</span>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Carriage Width</span>
+                <span class="custom-label">Pendopo Span (W)</span>
                 <div class="dim-slider-wrap">
                   <input type="range" class="dim-slider" id="slider-dim-width" min="0.75" max="1.28" step="0.01" value="1.00" data-default="1.00" />
-                  <span class="dim-val-badge" id="val-dim-width" data-reset-slider="slider-dim-width" title="Click to reset Width">2 140 MM</span>
+                  <span class="dim-val-badge" id="val-dim-width" data-reset-slider="slider-dim-width" title="Click to reset Width">9 800 MM</span>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Carriage Height</span>
+                <span class="custom-label">Overall Height</span>
                 <div class="dim-slider-wrap">
                   <input type="range" class="dim-slider" id="slider-dim-height" min="0.78" max="1.26" step="0.01" value="1.00" data-default="1.00" />
-                  <span class="dim-val-badge" id="val-dim-height" data-reset-slider="slider-dim-height" title="Click to reset Height">3 200 MM</span>
+                  <span class="dim-val-badge" id="val-dim-height" data-reset-slider="slider-dim-height" title="Click to reset Height">7 600 MM</span>
                 </div>
               </div>
             </div>
 
             <div class="atelier-subcard">
               <div class="subcard-head">
-                <span class="subcard-title">Silhouette &amp; Suspension</span>
-                <span class="subcard-hint">Auto-adjusts clearance</span>
+                <span class="subcard-title">Roof Silhouette &amp; Plinth</span>
+                <span class="subcard-hint">Real-time vertex morph</span>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Roof Arch Height</span>
+                <span class="custom-label">Brunjung Pitch</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-roof-crown" min="0.68" max="1.45" step="0.01" value="1.00" data-default="1.00" title="Morph Roof Vault Arch & Finials Height" />
-                  <span class="dim-val-badge" id="val-roof-crown" data-reset-slider="slider-roof-crown" title="Click to reset Roof Arch">100%</span>
+                  <input type="range" class="dim-slider" id="slider-roof-crown" min="0.68" max="1.45" step="0.01" value="1.00" data-default="1.00" title="Morph Steep Brunjung Central Roof Crown Height" />
+                  <span class="dim-val-badge" id="val-roof-crown" data-reset-slider="slider-roof-crown" title="Click to reset Brunjung Pitch">100%</span>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Upper Cabin Flare</span>
+                <span class="custom-label">Eaves Overhang</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-cabin-scale" min="0.85" max="1.18" step="0.01" value="1.00" data-default="1.00" title="Flare or Taper Upper Cabin Walls Above Wheel Arches" />
-                  <span class="dim-val-badge" id="val-cabin-scale" data-reset-slider="slider-cabin-scale" title="Click to reset Cabin Flare">100%</span>
+                  <input type="range" class="dim-slider" id="slider-cabin-scale" min="0.85" max="1.18" step="0.01" value="1.00" data-default="1.00" title="Expand or Compact Outer Penanggap Eaves Overhang" />
+                  <span class="dim-val-badge" id="val-cabin-scale" data-reset-slider="slider-cabin-scale" title="Click to reset Eaves Overhang">100%</span>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Suspension Lift</span>
+                <span class="custom-label">Plinth Step Lift</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-ride-height" min="0.00" max="0.22" step="0.01" value="0.00" data-default="0.00" title="Lift Cabin on Leaf Springs" />
-                  <span class="dim-val-badge" id="val-ride-height" data-reset-slider="slider-ride-height" title="Click to reset Suspension Lift">+0 MM</span>
+                  <input type="range" class="dim-slider" id="slider-ride-height" min="0.00" max="0.22" step="0.01" value="0.00" data-default="0.00" title="Elevate Undak-Undakan Stone Plinth Foundation" />
+                  <span class="dim-val-badge" id="val-ride-height" data-reset-slider="slider-ride-height" title="Click to reset Plinth Elevation">+0 MM</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- TAB 3: WHEELS, STANCE & DRIVE MOTION -->
+          <!-- TAB 3: SOKO GURU COLUMNS, UMPAK PEDESTALS & TUMPANG SARI -->
           <div class="atelier-tab-pane" data-pane="wheels">
             <div class="atelier-subcard">
               <div class="subcard-head">
-                <span class="subcard-title">Wheel Design &amp; Diameter</span>
-                <span class="subcard-hint">Auto-levels chassis</span>
+                <span class="subcard-title">Soko Guru &amp; Umpak Pedestals</span>
+                <span class="subcard-hint">Structural proportions</span>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Wheel Style</span>
+                <span class="custom-label">Pendopo Style</span>
                 <div class="seg-pills" data-seg="wheel_style">
-                  <button class="seg-pill active" data-val="spokes">12-Spoke</button>
-                  <button class="seg-pill" data-val="tracery">Tracery Ring</button>
-                  <button class="seg-pill" data-val="disc">Royal Disc</button>
+                  <button class="seg-pill active" data-val="spokes">Umpak Padma</button>
+                  <button class="seg-pill" data-val="tracery">Santen Emas</button>
+                  <button class="seg-pill" data-val="disc">Pagar Langkan</button>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Front Wheel Dia</span>
+                <span class="custom-label">Soko Guru Girth</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-wheel-front" min="0.75" max="1.25" step="0.01" value="1.00" data-default="1.00" title="Front Wheel Diameter" />
-                  <span class="dim-val-badge" id="val-wheel-front" data-reset-slider="slider-wheel-front" title="Click to reset Front Wheel">1 100 MM</span>
+                  <input type="range" class="dim-slider" id="slider-wheel-front" min="0.75" max="1.35" step="0.01" value="1.00" data-default="1.00" title="4 Central Soko Guru Master Teak Column Thickness" />
+                  <span class="dim-val-badge" id="val-wheel-front" data-reset-slider="slider-wheel-front" title="Click to reset Soko Guru Girth">320 MM</span>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Rear Wheel Dia</span>
+                <span class="custom-label">Umpak Height</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-wheel-rear" min="0.75" max="1.25" step="0.01" value="1.00" data-default="1.00" title="Rear Wheel Diameter" />
-                  <span class="dim-val-badge" id="val-wheel-rear" data-reset-slider="slider-wheel-rear" title="Click to reset Rear Wheel">1 260 MM</span>
+                  <input type="range" class="dim-slider" id="slider-wheel-rear" min="0.75" max="1.35" step="0.01" value="1.00" data-default="1.00" title="Carved Andesite Umpak Pedestal Height" />
+                  <span class="dim-val-badge" id="val-wheel-rear" data-reset-slider="slider-wheel-rear" title="Click to reset Umpak Height">520 MM</span>
                 </div>
               </div>
             </div>
 
             <div class="atelier-subcard">
               <div class="subcard-head">
-                <span class="subcard-title">Tire Stance &amp; Road Speed</span>
-                <span class="subcard-hint">Live physics</span>
+                <span class="subcard-title">Tumpang Sari &amp; Eave Flare</span>
+                <span class="subcard-hint">Joinery &amp; ambiance</span>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Tire Rim Width</span>
+                <span class="custom-label">Tumpang Sari</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-wheel-rim" min="0.70" max="1.45" step="0.01" value="1.00" data-default="1.00" title="Forged Iron Tire & Wooden Rim Width" />
-                  <span class="dim-val-badge" id="val-wheel-rim" data-reset-slider="slider-wheel-rim" title="Click to reset Rim Width">100%</span>
+                  <input type="range" class="dim-slider" id="slider-wheel-rim" min="0.70" max="1.45" step="0.01" value="1.00" data-default="1.00" title="Stepped Pyramid Tumpang Sari Ceiling Depth" />
+                  <span class="dim-val-badge" id="val-wheel-rim" data-reset-slider="slider-wheel-rim" title="Click to reset Tumpang Sari Depth">100%</span>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Outward Camber</span>
+                <span class="custom-label">Eave Upturn</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-wheel-camber" min="0" max="7" step="0.5" value="0" data-default="0" title="Outward Victorian Coach Wheel Tilt" />
-                  <span class="dim-val-badge" id="val-wheel-camber" data-reset-slider="slider-wheel-camber" title="Click to reset Camber">0.0&deg;</span>
+                  <input type="range" class="dim-slider" id="slider-wheel-camber" min="0" max="7" step="0.5" value="0" data-default="0" title="Javanese Roof Eave Upturn Flare Angle" />
+                  <span class="dim-val-badge" id="val-wheel-camber" data-reset-slider="slider-wheel-camber" title="Click to reset Eave Upturn">0.0&deg;</span>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Road Drive Speed</span>
+                <span class="custom-label">Breeze &amp; Sway</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-drive-speed" min="0.0" max="2.2" step="0.05" value="1.00" data-default="1.00" title="Cobblestone Drive Speed & Suspension Bounce" />
-                  <span class="dim-val-badge" id="val-drive-speed" data-reset-slider="slider-drive-speed" title="Click to reset Drive Speed">100%</span>
+                  <input type="range" class="dim-slider" id="slider-drive-speed" min="0.0" max="2.2" step="0.05" value="1.00" data-default="1.00" title="Tropical Courtyard Breeze &amp; Chandelier Sway Speed" />
+                  <span class="dim-val-badge" id="val-drive-speed" data-reset-slider="slider-drive-speed" title="Click to reset Breeze Speed">100%</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- TAB 4: DIRECT INTERACTIVE DOORS, WINDOWS & EXTERIOR TRIM -->
+          <!-- TAB 4: DIRECT INTERACTIVE GEBYOK DOORS, KREPYAK WINDOWS & ORNAMENTS -->
           <div class="atelier-tab-pane" data-pane="trim">
             <div class="atelier-subcard">
               <div class="subcard-head">
-                <span class="subcard-title">Interactive Doors &amp; Windows</span>
+                <span class="subcard-title">Gebyok Doors &amp; Krepyak Windows</span>
                 <span class="subcard-hint">Click to open / close</span>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Coach Doors</span>
+                <span class="custom-label">Kori Agung Doors</span>
                 <div class="seg-pills" id="seg-door-mode">
                   <button class="seg-pill active" data-dmode="closed">Closed</button>
                   <button class="seg-pill" data-dmode="left">Left</button>
@@ -638,18 +637,18 @@
               <div class="custom-row">
                 <span class="custom-label">Door Swing Angle</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-door-angle" min="0" max="90" step="1" value="0" data-default="0" title="Door Opening Angle" />
+                  <input type="range" class="dim-slider" id="slider-door-angle" min="0" max="90" step="1" value="0" data-default="0" title="Kori Agung Door Opening Angle" />
                   <span class="dim-val-badge" id="val-door-angle" data-reset-slider="slider-door-angle">0&deg;</span>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Casement Windows</span>
+                <span class="custom-label">Krepyak Windows</span>
                 <div class="seg-pills" id="seg-window-mode">
                   <button class="seg-pill active" data-wmode="closed">Closed</button>
-                  <button class="seg-pill" data-wmode="side">Doors</button>
-                  <button class="seg-pill" data-wmode="front">Front</button>
-                  <button class="seg-pill" data-wmode="rear">Rear</button>
+                  <button class="seg-pill" data-wmode="side">Gebyok</button>
+                  <button class="seg-pill" data-wmode="front">Transom</button>
+                  <button class="seg-pill" data-wmode="rear">Dalem</button>
                   <button class="seg-pill" data-wmode="all">All 5</button>
                 </div>
               </div>
@@ -657,7 +656,7 @@
               <div class="custom-row">
                 <span class="custom-label">Window Open Angle</span>
                 <div class="dim-slider-wrap">
-                  <input type="range" class="dim-slider" id="slider-window-angle" min="0" max="72" step="1" value="0" data-default="0" title="Window Opening Angle" />
+                  <input type="range" class="dim-slider" id="slider-window-angle" min="0" max="72" step="1" value="0" data-default="0" title="Krepyak Window Opening Angle" />
                   <span class="dim-val-badge" id="val-window-angle" data-reset-slider="slider-window-angle">0&deg;</span>
                 </div>
               </div>
@@ -665,33 +664,33 @@
 
             <div class="atelier-subcard">
               <div class="subcard-head">
-                <span class="subcard-title">Coach Trim &amp; Accessories</span>
-                <span class="subcard-hint">Bespoke appointments</span>
+                <span class="subcard-title">Sacred Ornaments &amp; Lighting</span>
+                <span class="subcard-hint">Keraton appointments</span>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Side Medallions</span>
+                <span class="custom-label">Gebyok Crest</span>
                 <div class="seg-pills" data-seg="medallions">
-                  <button class="seg-pill active" data-val="skulls">Skulls</button>
-                  <button class="seg-pill" data-val="rosettes">Rosettes</button>
+                  <button class="seg-pill active" data-val="skulls">Gunungan</button>
+                  <button class="seg-pill" data-val="rosettes">Kala Makara</button>
                   <button class="seg-pill" data-val="none">None</button>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Roof Chimney</span>
+                <span class="custom-label">Roof Mustaka</span>
                 <div class="seg-pills" data-seg="chimney">
-                  <button class="seg-pill active" data-val="standard">Standard</button>
-                  <button class="seg-pill" data-val="tall">Tall Stack</button>
-                  <button class="seg-pill" data-val="none">None</button>
+                  <button class="seg-pill active" data-val="standard">Mustaka</button>
+                  <button class="seg-pill" data-val="tall">Tall Garuda</button>
+                  <button class="seg-pill" data-val="none">Plain Ridge</button>
                 </div>
               </div>
 
               <div class="custom-row">
-                <span class="custom-label">Coach Lanterns</span>
+                <span class="custom-label">Pendopo Lamps</span>
                 <div class="seg-pills" data-seg="lanterns_mode">
-                  <button class="seg-pill active" data-val="all">All 4</button>
-                  <button class="seg-pill" data-val="front">Front Pair</button>
+                  <button class="seg-pill active" data-val="all">All 5</button>
+                  <button class="seg-pill" data-val="front">Robyong</button>
                   <button class="seg-pill" data-val="none">None</button>
                 </div>
               </div>
@@ -726,7 +725,7 @@
               <polygon points="2,4 8,1.5 8,6.5" fill="#54483f"/>
               <polygon points="218,4 212,1.5 212,6.5" fill="#54483f"/>
             </svg>
-            <span class="elev-mm" id="elev-mm-length">4 860 MM</span>
+            <span class="elev-mm" id="elev-mm-length">11 400 MM</span>
           </div>
         </div>
 
@@ -734,12 +733,12 @@
         <div class="elevation-plate" data-elev-view="front" title="Click to switch 3D camera to Front Elevation">
           <div class="elevation-drawing-wrap">
             <div class="front-vert-dim">
-              <span id="elev-mm-height">3 200 MM</span>
+              <span id="elev-mm-height">7 600 MM</span>
             </div>
             <img id="img-elev-front" class="elev-img-front" src="./ui_renders/elev_front.png" alt="Front Elevation Orthographic Drawing" />
           </div>
           <div class="elev-dim-bar" style="width: 58%;">
-            <span class="elev-mm" id="elev-mm-width" style="margin-bottom:1px;">2 140 MM</span>
+            <span class="elev-mm" id="elev-mm-width" style="margin-bottom:1px;">9 800 MM</span>
             <svg width="100%" height="8" viewBox="0 0 150 8">
               <line x1="4" y1="4" x2="146" y2="4" stroke="#54483f" stroke-width="0.9"/>
               <polygon points="2,4 8,1.5 8,6.5" fill="#54483f"/>
@@ -767,32 +766,32 @@
         </div>
 
         <div class="swatches-grid">
-          <div class="swatch-item" data-swatch="timber" title="Inspect Weathered Timber & Paint">
+          <div class="swatch-item" data-swatch="timber" title="Inspect Soko Guru Kayu Jati &amp; Prada Gold">
             <div class="swatch-frame">
-              <img id="img-swatch-timber" src="./ui_renders/swatch_timber.png" alt="Timber & Paint" />
+              <img id="img-swatch-timber" src="./ui_renders/swatch_timber.png" alt="Kayu Jati &amp; Prada" />
             </div>
-            <span class="swatch-label">Timber &amp; Paint</span>
+            <span class="swatch-label">Kayu Jati</span>
           </div>
 
-          <div class="swatch-item" data-swatch="iron" title="Inspect Forged Iron Tracery">
+          <div class="swatch-item" data-swatch="iron" title="Inspect Carved Gebyok &amp; Kori Agung">
             <div class="swatch-frame">
-              <img id="img-swatch-iron" src="./ui_renders/swatch_iron.png" alt="Forged Iron" />
+              <img id="img-swatch-iron" src="./ui_renders/swatch_iron.png" alt="Ukiran Gebyok" />
             </div>
-            <span class="swatch-label">Forged Iron</span>
+            <span class="swatch-label">Ukiran Gebyok</span>
           </div>
 
-          <div class="swatch-item" data-swatch="glass" title="Inspect Leaded Stained Glass">
+          <div class="swatch-item" data-swatch="glass" title="Inspect Stepped Tumpang Sari Ceiling">
             <div class="swatch-frame">
-              <img id="img-swatch-glass" src="./ui_renders/swatch_glass.png" alt="Stained Glass" />
+              <img id="img-swatch-glass" src="./ui_renders/swatch_glass.png" alt="Tumpang Sari" />
             </div>
-            <span class="swatch-label">Stained Glass</span>
+            <span class="swatch-label">Tumpang Sari</span>
           </div>
 
-          <div class="swatch-item" data-swatch="skull" title="Inspect Sculpted Skull Emblem">
+          <div class="swatch-item" data-swatch="skull" title="Inspect Terracotta Genteng &amp; Mustaka Crown">
             <div class="swatch-frame">
-              <img id="img-swatch-skull" src="./ui_renders/swatch_skull.png" alt="Skull Emblem" />
+              <img id="img-swatch-skull" src="./ui_renders/swatch_skull.png" alt="Genteng &amp; Mustaka" />
             </div>
-            <span class="swatch-label">Skull Emblem</span>
+            <span class="swatch-label">Atap Mustaka</span>
           </div>
         </div>
       </div>

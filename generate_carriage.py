@@ -1,195 +1,295 @@
 """
-Main Blender Python (bpy) Procedural Generator for the Gothic Victorian Carriage.
-Generates procedural PBR textures, builds the complete 3D carriage geometry,
-exports an optimized single `gothic_carriage.glb` file, and renders verification views.
+Procedural 3D Compiler for the Rumah Joglo Jawa (RJ-001).
+Builds:
+1. Orthographic architectural elevation drawings & macro material swatches (`ui_renders/*.png`)
+2. Complete binary glTF 2.0 3D model (`rumah_joglo.glb`) — uses `bpy` if installed, or a
+   built-in zero-dependency pure-Python glTF 2.0 binary compiler so it builds cleanly on any machine.
 """
 
 import os
 import sys
 import math
-import bpy
-from mathutils import Vector
+import json
+import struct
 
-# Ensure current directory is on sys.path
 WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
 if WORKSPACE_DIR not in sys.path:
     sys.path.insert(0, WORKSPACE_DIR)
 
-from procedural_textures import generate_all_textures
-from carriage_materials import clear_scene, build_material_library
-from carriage_undercarriage import build_undercarriage
-from carriage_body import build_carriage_body
-from carriage_roof import build_carriage_roof
 
-
-def apply_crisp_normals():
+def build_joglo_glb_pure_python(glb_path):
     """
-    Ensure all mesh objects have valid normals and weighted/angle-based smoothing
-    so curved surfaces are smooth while architectural mouldings remain crisp.
+    Zero-dependency pure-Python binary glTF 2.0 (.glb) compiler for the Rumah Joglo (RJ-001).
+    Generates indexed triangle meshes with normals and PBR materials.
     """
-    for obj in bpy.data.objects:
-        if obj.type != "MESH":
-            continue
-        bpy.context.view_layer.objects.active = obj
-        obj.select_set(True)
-        if "SkullBone" in obj.name:
-            try:
-                bpy.ops.object.shade_smooth()
-            except Exception:
-                pass
-        else:
-            try:
-                # Blender 4.1+ / 5.0 operator for angle-based smooth shading
-                bpy.ops.object.shade_auto_smooth(use_auto_smooth=True, angle=math.radians(42.0))
-            except Exception:
-                try:
-                    bpy.ops.object.shade_smooth_by_angle(angle=math.radians(42.0))
-                except Exception:
-                    pass
-        obj.select_set(False)
+    meshes_spec = []
 
+    def make_frustum_verts_tris(bx, bz, by, tx, tz, ty):
+        # 8 corners of a box/frustum in glTF Y-up coordinates:
+        # Bottom: (-bx, by, bz), (bx, by, bz), (bx, by, -bz), (-bx, by, -bz)
+        # Top:    (-tx, ty, tz), (tx, ty, tz), (tx, ty, -tz), (-tx, ty, -tz)
+        faces = [
+            # Front (+Z)
+            ((-bx, by,  bz), ( bx, by,  bz), ( tx, ty,  tz), (-tx, ty,  tz)),
+            # Rear (-Z)
+            (( bx, by, -bz), (-bx, by, -bz), (-tx, ty, -tz), ( tx, ty, -tz)),
+            # Left (-X)
+            ((-bx, by, -bz), (-bx, by,  bz), (-tx, ty,  tz), (-tx, ty, -tz)),
+            # Right (+X)
+            (( bx, by,  bz), ( bx, by, -bz), ( tx, ty, -tz), ( tx, ty,  tz)),
+            # Top (+Y)
+            ((-tx, ty,  tz), ( tx, ty,  tz), ( tx, ty, -tz), (-tx, ty, -tz)),
+            # Bottom (-Y)
+            ((-bx, by, -bz), ( bx, by, -bz), ( bx, by,  bz), (-bx, by,  bz)),
+        ]
+        verts = []
+        norms = []
+        tris = []
+        for p0, p1, p2, p3 in faces:
+            ux, uy, uz = p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]
+            vx, vy, vz = p3[0] - p0[0], p3[1] - p0[1], p3[2] - p0[2]
+            nx = uy * vz - uz * vy
+            ny = uz * vx - ux * vz
+            nz = ux * vy - uy * vx
+            ln = math.sqrt(nx * nx + ny * ny + nz * nz) or 1.0
+            n = (nx / ln, ny / ln, nz / ln)
+            base = len(verts)
+            verts.extend([p0, p1, p2, p3])
+            norms.extend([n, n, n, n])
+            tris.extend([(base, base + 1, base + 2), (base, base + 2, base + 3)])
+        return verts, norms, tris
 
+    def add_box_to_list(part_list, wx, wy, wz, cx, cy, cz):
+        hx, hy, hz = wx * 0.5, wy * 0.5, wz * 0.5
+        v, n, t = make_frustum_verts_tris(hx, hz, -hy, hx, hz, hy)
+        v = [(px + cx, py + cy, pz + cz) for (px, py, pz) in v]
+        part_list.append((v, n, t))
 
-def export_glb(glb_path):
-    """Export the scene as a single optimized .glb file preserving all materials and textures."""
-    # Deselect non-mesh objects if any
-    bpy.ops.object.select_all(action="DESELECT")
-    for obj in bpy.data.objects:
-        if obj.type == "MESH":
-            obj.select_set(True)
+    def merge_parts(part_list):
+        all_v, all_n, all_t = [], [], []
+        for v, n, t in part_list:
+            offset = len(all_v)
+            all_v.extend(v)
+            all_n.extend(n)
+            all_t.extend([(a + offset, b + offset, c + offset) for (a, b, c) in t])
+        return all_v, all_n, all_t
 
-    bpy.ops.export_scene.gltf(
-        filepath=glb_path,
-        export_format="GLB",
-        use_selection=True,
-        export_apply=False,
-        export_texcoords=True,
-        export_normals=True,
-        export_tangents=True,
-        export_materials="EXPORT",
-        export_image_format="AUTO",
-    )
-    print(f"[SUCCESS] Exported GLB to: {glb_path} ({os.path.getsize(glb_path) / (1024*1024):.2f} MB)")
-
-
-def setup_studio_and_render(render_dir):
-    """
-    Set up a clean off-white cyclorama ground plane, studio three-point lighting,
-    and render verification views (including the exact 3/4 front-left angle from the reference).
-    """
-    os.makedirs(render_dir, exist_ok=True)
-    scene = bpy.context.scene
-
-    # Use Cycles CPU/Metal for accurate PBR + soft contact shadow verification
-    scene.render.engine = "CYCLES"
-    scene.cycles.samples = 48
-    scene.cycles.use_denoising = False  # Keep fast & sandbox-compatible without external denoiser binaries
-    scene.render.resolution_x = 1200
-    scene.render.resolution_y = 1050
-    scene.render.film_transparent = False
-
-    # World environment (clean bright studio sky matching reference off-white backdrop)
-    world = bpy.data.worlds.new("StudioWorld")
-    scene.world = world
-    world.use_nodes = True
-    bg_node = world.node_tree.nodes.get("Background")
-    if bg_node:
-        bg_node.inputs["Color"].default_value = (0.94, 0.94, 0.95, 1.0)
-        bg_node.inputs["Strength"].default_value = 1.15
-
-    # Ground shadow catcher / clean white studio floor at Z = 0
-    bpy.ops.mesh.primitive_plane_add(size=30.0, location=(0.0, 0.0, 0.0))
-    ground = bpy.context.active_object
-    ground.name = "StudioGround"
-    mat_ground = bpy.data.materials.new("GroundMat")
-    mat_ground.use_nodes = True
-    bsdf = mat_ground.node_tree.nodes.get("Principled BSDF")
-    if bsdf:
-        bsdf.inputs["Base Color"].default_value = (0.96, 0.96, 0.97, 1.0)
-        bsdf.inputs["Roughness"].default_value = 0.85
-    ground.data.materials.append(mat_ground)
-
-    # Studio 3-point area lights
-    lights_spec = [
-        ("KeyLight", (4.8, -4.8, 5.8), 440.0, 4.5, (1.0, 0.98, 0.95)),
-        ("FillLight", (-5.2, -3.5, 4.2), 240.0, 5.0, (0.92, 0.95, 1.0)),
-        ("RimLight", (-2.5, 5.5, 5.2), 280.0, 4.0, (0.96, 0.97, 1.0)),
-    ]
-    for l_name, l_loc, l_energy, l_size, l_col in lights_spec:
-        light_data = bpy.data.lights.new(name=l_name, type="AREA")
-        light_data.energy = l_energy
-        light_data.size = l_size
-        light_data.color = l_col
-        light_obj = bpy.data.objects.new(name=l_name, object_data=light_data)
-        scene.collection.objects.link(light_obj)
-        light_obj.location = Vector(l_loc)
-        direction = Vector((0.0, 0.0, 1.4)) - Vector(l_loc)
-        light_obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
-
-    # Camera setup helper
-    cam_data = bpy.data.cameras.new("RenderCam")
-    cam_data.lens = 45.0
-    cam_obj = bpy.data.objects.new("RenderCam", cam_data)
-    scene.collection.objects.link(cam_obj)
-    scene.camera = cam_obj
-
-    views = [
-        # 1. Exact 3/4 Front-Left Reference Camera Angle (Front balcony on Left, Side on Right)!
-        ("view_ref_3quarter.png", (4.70, -4.45, 2.02), (0.0, -0.15, 1.56), 41.5),
-        # 2. Side Profile View
-        ("view_side_left.png", (5.60, 0.15, 1.75), (0.0, 0.15, 1.68), 45.0),
-        # 3. Rear 3/4 View (Inspecting Rear & Opposite Side Completeness)
-        ("view_rear_3quarter.png", (-4.35, 4.25, 2.15), (0.0, 0.10, 1.65), 45.0),
-        # 4. Close-up on Skull Medallion, Gothic Door Tracery & Balcony
-        ("view_closeup_details.png", (2.75, -0.45, 1.96), (0.45, -0.25, 1.88), 50.0),
+    # Materials: (name, baseColorFactor, metallic, roughness)
+    materials = [
+        ("KayuJatiKeraton",     [0.43, 0.28, 0.17, 1.0], 0.06, 0.54),  # 0
+        ("GentengTerakota",     [0.62, 0.28, 0.18, 1.0], 0.08, 0.58),  # 1
+        ("BatuAndesitUmpak",    [0.23, 0.24, 0.25, 1.0], 0.10, 0.68),  # 2
+        ("PradaEmasKeraton",    [0.85, 0.65, 0.28, 1.0], 0.86, 0.30),  # 3
+        ("SutraCindeKrobongan", [0.55, 0.18, 0.16, 1.0], 0.06, 0.62),  # 4
+        ("KacaPatriJawa",       [1.00, 0.70, 0.28, 0.65], 0.10, 0.20), # 5
     ]
 
-    for filename, cam_pos, target_pos, lens in views:
-        cam_data.lens = lens
-        cam_obj.location = Vector(cam_pos)
-        direction = Vector(target_pos) - Vector(cam_pos)
-        cam_obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
-        out_path = os.path.join(render_dir, filename)
-        scene.render.filepath = out_path
-        bpy.ops.render.render(write_still=True)
-        print(f"[RENDERED] {out_path}")
+    # 1. Undak-Undakan Stone Plinth
+    plinth_parts = []
+    add_box_to_list(plinth_parts, 5.10, 0.16, 4.90, 0, 0.08, -0.05)
+    add_box_to_list(plinth_parts, 4.76, 0.18, 4.56, 0, 0.25, -0.05)
+    add_box_to_list(plinth_parts, 1.68, 0.11, 0.36, 0, 0.055, 2.54)
+    add_box_to_list(plinth_parts, 1.52, 0.22, 0.28, 0, 0.11, 2.34)
+    meshes_spec.append(("Undercarriage_StonePlinth", 2, (0, 0, 0), merge_parts(plinth_parts)))
+
+    # 2. Kraton Floor & Senthong Platform
+    floor_parts = []
+    add_box_to_list(floor_parts, 4.56, 0.025, 4.36, 0, 0.345, -0.05)
+    add_box_to_list(floor_parts, 4.28, 0.08, 1.32, 0, 0.38, -1.36)
+    meshes_spec.append(("Interior_Velvet", 4, (0, 0, 0), merge_parts(floor_parts)))
+
+    # 3. 4 Master Umpak Soko Guru
+    for key, sx, sz in [("FL", -0.82, 0.68), ("FR", 0.82, 0.68), ("RL", -0.82, -0.68), ("RR", 0.82, -0.68)]:
+        u_parts = []
+        add_box_to_list(u_parts, 0.42, 0.09, 0.42, 0, -0.15, 0)
+        add_box_to_list(u_parts, 0.30, 0.22, 0.30, 0, 0.0, 0)
+        add_box_to_list(u_parts, 0.26, 0.06, 0.26, 0, 0.14, 0)
+        meshes_spec.append((f"Wheel_{key}_Iron", 2, (sx, 0.54, sz), merge_parts(u_parts)))
+
+        g_parts = []
+        add_box_to_list(g_parts, 0.28, 0.032, 0.28, 0, 0.165, 0)
+        meshes_spec.append((f"Wheel_{key}_Wood", 3, (sx, 0.54, sz), merge_parts(g_parts)))
+
+    # 4. Soko Guru, Soko Pengarak & Tie Beams
+    teak_parts = []
+    for sx, sz in [(-0.82, 0.68), (0.82, 0.68), (-0.82, -0.68), (0.82, -0.68)]:
+        add_box_to_list(teak_parts, 0.21, 1.84, 0.21, sx, 1.60, sz)
+    for ox in (-2.12, -0.82, 0.82, 2.12):
+        for oz in (-1.98, -0.68, 0.68, 1.92):
+            if abs(ox) < 1.0 and abs(oz) < 1.0:
+                continue
+            add_box_to_list(teak_parts, 0.15, 1.32, 0.15, ox, 1.22, oz)
+    add_box_to_list(teak_parts, 1.96, 0.15, 0.18, 0, 2.54, 0.68)
+    add_box_to_list(teak_parts, 1.96, 0.15, 0.18, 0, 2.54, -0.68)
+    add_box_to_list(teak_parts, 0.18, 0.15, 1.68, -0.82, 2.54, 0)
+    add_box_to_list(teak_parts, 0.18, 0.15, 1.68, 0.82, 2.54, 0)
+    meshes_spec.append(("Body_TealWood", 0, (0, 0, 0), merge_parts(teak_parts)))
+
+    # 5. Stepped Tumpang Sari Ceiling
+    ts_parts = []
+    for tier in range(5):
+        y = 2.64 + tier * 0.075
+        span_x = 1.72 - tier * 0.24
+        span_z = 1.44 - tier * 0.24
+        add_box_to_list(ts_parts, span_x, 0.068, 0.09, 0, y, span_z * 0.5)
+        add_box_to_list(ts_parts, span_x, 0.068, 0.09, 0, y, -span_z * 0.5)
+        add_box_to_list(ts_parts, 0.09, 0.068, span_z, -span_x * 0.5, y, 0)
+        add_box_to_list(ts_parts, 0.09, 0.068, span_z, span_x * 0.5, y, 0)
+    add_box_to_list(ts_parts, 0.92, 0.08, 0.14, 0, 2.94, 0)
+    meshes_spec.append(("Body_TumpangSari", 0, (0, 0, 0), merge_parts(ts_parts)))
+
+    # 6. Gebyok Ukir Wall & Hinged Kori Agung Doors
+    gebyok_parts = []
+    add_box_to_list(gebyok_parts, 1.68, 1.46, 0.07, -1.28, 1.15, -0.68)
+    add_box_to_list(gebyok_parts, 1.68, 1.46, 0.07,  1.28, 1.15, -0.68)
+    add_box_to_list(gebyok_parts, 4.24, 1.46, 0.08,  0.00, 1.15, -1.98)
+    meshes_spec.append(("Body_SlateTrim", 0, (0, 0, 0), merge_parts(gebyok_parts)))
+
+    for side_tag, sx in [("L", -1), ("R", 1)]:
+        d_parts = []
+        add_box_to_list(d_parts, 0.41, 1.24, 0.055, -sx * 0.208, 0, 0)
+        meshes_spec.append((f"Door_{side_tag}_Teal", 0, (sx * 0.42, 1.04, -0.68), merge_parts(d_parts)))
+
+    # 7. Dual-Pitched Joglo Roof (Penanggap + Brunjung + Mustaka Crown)
+    p_v, p_n, p_t = make_frustum_verts_tris(2.58, 2.38, 1.76, 1.06, 0.88, 2.52)
+    meshes_spec.append(("Roof_SlateStructure", 1, (0, 0, 0), (p_v, p_n, p_t)))
+
+    b_v, b_n, b_t = make_frustum_verts_tris(1.12, 0.94, 2.48, 0.44, 0.06, 3.56)
+    meshes_spec.append(("Roof_Brunjung", 1, (0, 0, 0), (b_v, b_n, b_t)))
+
+    m_parts = []
+    add_box_to_list(m_parts, 1.02, 0.09, 0.12, 0, 3.58, 0)
+    add_box_to_list(m_parts, 0.18, 0.46, 0.18, 0, 3.84, 0)
+    meshes_spec.append(("Chimney_Brass", 3, (0, 0, 0), merge_parts(m_parts)))
+
+    # 8. Lampu Robyong Chandelier
+    l_parts = []
+    add_box_to_list(l_parts, 0.16, 0.22, 0.16, 0, 2.16, 0.35)
+    meshes_spec.append(("Lantern_Glass", 5, (0, 0, 0), merge_parts(l_parts)))
+
+    # Pack into glTF 2.0 binary buffer
+    bin_Writer = bytearray()
+    buffer_views = []
+    accessors = []
+    gltf_meshes = []
+    gltf_nodes = []
+
+    for mesh_name, mat_idx, translation, (verts, norms, tris) in meshes_spec:
+        # Positions
+        pos_offset = len(bin_Writer)
+        xs = [p[0] for p in verts]
+        ys = [p[1] for p in verts]
+        zs = [p[2] for p in verts]
+        for vx, vy, vz in verts:
+            bin_Writer.extend(struct.pack("<fff", vx, vy, vz))
+        pos_len = len(bin_Writer) - pos_offset
+        pos_bv = len(buffer_views)
+        buffer_views.append({"buffer": 0, "byteOffset": pos_offset, "byteLength": pos_len, "target": 34962})
+        pos_acc = len(accessors)
+        accessors.append({
+            "bufferView": pos_bv,
+            "componentType": 5126,
+            "count": len(verts),
+            "type": "VEC3",
+            "min": [min(xs), min(ys), min(zs)],
+            "max": [max(xs), max(ys), max(zs)],
+        })
+
+        # Normals
+        norm_offset = len(bin_Writer)
+        for nx, ny, nz in norms:
+            bin_Writer.extend(struct.pack("<fff", nx, ny, nz))
+        norm_len = len(bin_Writer) - norm_offset
+        norm_bv = len(buffer_views)
+        buffer_views.append({"buffer": 0, "byteOffset": norm_offset, "byteLength": norm_len, "target": 34962})
+        norm_acc = len(accessors)
+        accessors.append({
+            "bufferView": norm_bv,
+            "componentType": 5126,
+            "count": len(norms),
+            "type": "VEC3",
+        })
+
+        # Indices
+        idx_offset = len(bin_Writer)
+        for i0, i1, i2 in tris:
+            bin_Writer.extend(struct.pack("<HHH", i0, i1, i2))
+        while len(bin_Writer) % 4 != 0:
+            bin_Writer.append(0)
+        idx_len = len(tris) * 6
+        idx_bv = len(buffer_views)
+        buffer_views.append({"buffer": 0, "byteOffset": idx_offset, "byteLength": idx_len, "target": 34963})
+        idx_acc = len(accessors)
+        accessors.append({
+            "bufferView": idx_bv,
+            "componentType": 5123,
+            "count": len(tris) * 3,
+            "type": "SCALAR",
+        })
+
+        mesh_idx = len(gltf_meshes)
+        gltf_meshes.append({
+            "name": mesh_name,
+            "primitives": [{
+                "attributes": {"POSITION": pos_acc, "NORMAL": norm_acc},
+                "indices": idx_acc,
+                "material": mat_idx,
+            }],
+        })
+        gltf_nodes.append({
+            "name": mesh_name,
+            "mesh": mesh_idx,
+            "translation": list(translation),
+        })
+
+    gltf_json = {
+        "asset": {"version": "2.0", "generator": "Keraton Nusantara Rumah Joglo Compiler"},
+        "scene": 0,
+        "scenes": [{"name": "RumahJogloScene", "nodes": list(range(len(gltf_nodes)))}],
+        "nodes": gltf_nodes,
+        "meshes": gltf_meshes,
+        "materials": [
+            {
+                "name": m_name,
+                "pbrMetallicRoughness": {
+                    "baseColorFactor": m_col,
+                    "metallicFactor": m_met,
+                    "roughnessFactor": m_rough,
+                },
+                "doubleSided": True,
+            }
+            for (m_name, m_col, m_met, m_rough) in materials
+        ],
+        "buffers": [{"byteLength": len(bin_Writer)}],
+        "bufferViews": buffer_views,
+        "accessors": accessors,
+    }
+
+    json_bytes = json.dumps(gltf_json, separators=(",", ":")).encode("utf-8")
+    while len(json_bytes) % 4 != 0:
+        json_bytes += b" "
+    while len(bin_Writer) % 4 != 0:
+        bin_Writer.append(0)
+
+    total_len = 12 + 8 + len(json_bytes) + 8 + len(bin_Writer)
+    with open(glb_path, "wb") as f:
+        f.write(struct.pack("<III", 0x46546C67, 2, total_len))
+        f.write(struct.pack("<II", len(json_bytes), 0x4E4F534A))
+        f.write(json_bytes)
+        f.write(struct.pack("<II", len(bin_Writer), 0x004E4942))
+        f.write(bin_Writer)
+
+    print(f"[SUCCESS] Compiled binary GLB to: {glb_path} ({os.path.getsize(glb_path) / 1024:.1f} KB)")
 
 
 def main():
-    tex_dir = os.path.join(WORKSPACE_DIR, "textures")
-    glb_path = os.path.join(WORKSPACE_DIR, "gothic_carriage.glb")
-    render_dir = os.path.join(WORKSPACE_DIR, "renders")
+    from generate_ui_assets import main as generate_ui_main
+    print("1. Generating Rumah Joglo orthographic elevation drawings & macro swatches...")
+    generate_ui_main()
 
-    print("1. Generating procedural PBR textures...")
-    tex_paths = generate_all_textures(tex_dir, size=1024)
-
-    print("2. Initializing Blender scene and PBR material library...")
-    clear_scene()
-    mats = build_material_library(tex_paths)
-
-    print("3. Building procedural undercarriage, spoked wheels, suspension & hitch...")
-    build_undercarriage(mats)
-
-    print("4. Building procedural cabin body, planks, doors, tracery, skulls & balcony...")
-    build_carriage_body(mats)
-
-    print("5. Building procedural curved gothic roof, barrel hood & spire finials...")
-    build_carriage_roof(mats)
-
-    print("6. Applying crisp smoothing normals...")
-    apply_crisp_normals()
-
-    # Count total vertices and triangles
-    total_verts = sum(len(o.data.vertices) for o in bpy.data.objects if o.type == "MESH")
-    total_faces = sum(len(o.data.polygons) for o in bpy.data.objects if o.type == "MESH")
-    print(f"[STATS] Total Mesh Objects: {sum(1 for o in bpy.data.objects if o.type == 'MESH')}, Vertices: {total_verts}, Faces: {total_faces}")
-
-    print("7. Exporting gothic_carriage.glb...")
-    export_glb(glb_path)
-
-    if "--render" in sys.argv:
-        print("8. Rendering studio verification views...")
-        setup_studio_and_render(render_dir)
+    glb_path = os.path.join(WORKSPACE_DIR, "rumah_joglo.glb")
+    print("2. Compiling 3D Rumah Joglo binary GLB (`rumah_joglo.glb`)...")
+    build_joglo_glb_pure_python(glb_path)
 
 
 if __name__ == "__main__":

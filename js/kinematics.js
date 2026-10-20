@@ -35,8 +35,9 @@ const lastDeformState = {
   sCab: 1.0,
   chimMode: 'standard',
   sy: 1.0,
-  frontHubDeltaY: 0.0,
-  rearHubDeltaY: 0.0,
+  sWF: 1.0,
+  sRim: 1.0,
+  camberDeg: 0.0,
   totalLiftY: 0.0
 };
 
@@ -46,28 +47,37 @@ export function evalMorphedBodyPoint(px, py, pz, outVec) {
   const sz = carriageConfig.lengthScale;
   const sCrown = carriageConfig.roofCrownScale;
   const sCab = carriageConfig.cabinScale;
-  let flareMult = 1.0;
-  if (py > 1.30) {
-    const u = Math.min(1.0, (py - 1.30) / (2.40 - 1.30));
-    flareMult = 1.0 + (sCab - 1.0) * (u * u * (3.0 - 2.0 * u));
+
+  let eaveMult = 1.0;
+  if (py > 1.65 && py < 2.55) {
+    const rDist = Math.max(Math.abs(px) / 2.58, Math.abs(pz) / 2.38);
+    if (rDist > 0.55) {
+      eaveMult = 1.0 + (sCab - 1.0) * ((rDist - 0.55) / 0.45);
+    }
   }
-  const mx = px * flareMult;
-  const my = (py > 2.38) ? (2.38 + (py - 2.38) * sCrown) : py;
-  outVec.set(mx * sx, my * sy + kinematicState.currentTotalLiftY, pz * sz);
+  const mx = px * eaveMult;
+  const mz = pz * eaveMult;
+  const my = (py > 2.48) ? (2.48 + (py - 2.48) * sCrown) : py;
+  outVec.set(mx * sx, my * sy + kinematicState.currentTotalLiftY, mz * sz);
   return outVec;
 }
 
-export function deformCarriageGeometry(sy, sCrown, sCab, chimMode, frontHubDeltaY, rearHubDeltaY, totalLiftY) {
+export function deformCarriageGeometry(sy, sCrown, sCab, chimMode, sWF, sRim, camberDeg, totalLiftY) {
   if (sprungBodyMeshes.length === 0) return;
 
   const needBodyDeform = (
     !lastDeformState.initialized ||
     Math.abs(sCrown - lastDeformState.sCrown) > 1e-4 ||
     Math.abs(sCab - lastDeformState.sCab) > 1e-4 ||
+    Math.abs(sWF - lastDeformState.sWF) > 1e-4 ||
+    Math.abs(sRim - lastDeformState.sRim) > 1e-4 ||
+    Math.abs(camberDeg - lastDeformState.camberDeg) > 1e-4 ||
     chimMode !== lastDeformState.chimMode
   );
 
   if (needBodyDeform) {
+    const flareLift = Math.tan(THREE.MathUtils.degToRad(camberDeg)) * 0.85;
+
     for (const m of sprungBodyMeshes) {
       const posAttr = m.geometry?.attributes?.position;
       const orig = m.geometry?.userData?.origPos;
@@ -77,28 +87,14 @@ export function deformCarriageGeometry(sy, sCrown, sCab, chimMode, frontHubDelta
       const bp = m.userData.basePosition;
       const name = m.name || '';
       const isChimney = name.startsWith('Chimney_');
+      const isTumpang = name.startsWith('Body_Tumpang');
+      const isRoof = name.startsWith('Roof_');
+      const isTimberFrame = (name === 'Body_TealWood' || name === 'Body_Brass');
 
-      let bpFlare = 1.0;
-      if (bp.y > 1.30) {
-        const u = Math.min(1.0, (bp.y - 1.30) / (2.40 - 1.30));
-        bpFlare = 1.0 + (sCab - 1.0) * (u * u * (3.0 - 2.0 * u));
-      }
-      const mbpX = bp.x * bpFlare;
-      const mbpY = (bp.y > 2.38) ? (2.38 + (bp.y - 2.38) * sCrown) : bp.y;
+      const mbpX = bp.x;
+      const mbpY = (bp.y > 2.48) ? (2.48 + (bp.y - 2.48) * sCrown) : bp.y;
       const mbpZ = bp.z;
       m.userData.morphedBasePos.set(mbpX, mbpY, mbpZ);
-
-      if (m.userData.doorHingeBase) {
-        const dhb = m.userData.doorHingeBase;
-        let dhFlare = 1.0;
-        if (dhb.y > 1.30) {
-          const u = Math.min(1.0, (dhb.y - 1.30) / (2.40 - 1.30));
-          dhFlare = 1.0 + (sCab - 1.0) * (u * u * (3.0 - 2.0 * u));
-        }
-        const mdhX = dhb.x * dhFlare;
-        const mdhY = (dhb.y > 2.38) ? (2.38 + (dhb.y - 2.38) * sCrown) : dhb.y;
-        m.userData.morphedDoorHinge.set(mdhX, mdhY, dhb.z);
-      }
 
       const count = posAttr.count;
       for (let i = 0; i < count; i++) {
@@ -107,41 +103,62 @@ export function deformCarriageGeometry(sy, sCrown, sCab, chimMode, frontHubDelta
         const wy = orig[i3 + 1] + bp.y;
         const wz = orig[i3 + 2] + bp.z;
 
-        // Victorian coachbuilder upper-cabin flare / taper above wheel-well waist (y > 1.30)
-        let flareMult = 1.0;
-        if (wy > 1.30) {
-          const u = Math.min(1.0, (wy - 1.30) / (2.40 - 1.30));
-          flareMult = 1.0 + (sCab - 1.0) * (u * u * (3.0 - 2.0 * u));
-        }
-        const newWx = wx * flareMult;
-
-        // Seamless Roof Vault Crown across Roof_*, Body_* gables/eaves, Interior_* & Chimney_*
+        let newWx = wx;
         let newWy = wy;
-        if (wy > 2.38) {
-          newWy = 2.38 + (wy - 2.38) * sCrown;
+        let newWz = wz;
+
+        // 1. Soko Guru Master Column Girth Scaling (`sWF`) around each of the 4 central pillars (±0.82, ±0.68)
+        if (isTimberFrame && wy >= 0.65 && wy <= 2.46) {
+          for (const sgx of [-0.82, 0.82]) {
+            for (const sgz of [-0.68, 0.68]) {
+              const dx = wx - sgx;
+              const dz = wz - sgz;
+              if (Math.abs(dx) < 0.16 && Math.abs(dz) < 0.16) {
+                newWx = sgx + dx * sWF;
+                newWz = sgz + dz * sWF;
+              }
+            }
+          }
         }
-        if (isChimney && chimMode === 'tall' && wy > 2.58) {
-          const chimBaseY = 2.38 + (2.58 - 2.38) * sCrown;
-          newWy = chimBaseY + (newWy - chimBaseY) * 1.55;
+
+        // 2. Tumpang Sari Stepped Ceiling Beam Relief Depth (`sRim`)
+        if (isTumpang && wy > 2.55) {
+          newWy = 2.58 + (wy - 2.58) * sRim;
+        }
+
+        // 3. Penanggap Eaves Overhang Span (`sCab`) & Upturned Eave Flare (`camberDeg`)
+        if (isRoof && wy < 2.50) {
+          const rNorm = Math.max(0.0, (Math.max(Math.abs(wx) / 2.58, Math.abs(wz) / 2.38) - 0.42) / 0.58);
+          const spanMult = 1.0 + (sCab - 1.0) * rNorm;
+          newWx = wx * spanMult;
+          newWz = wz * spanMult;
+          newWy += (rNorm * rNorm) * flareLift;
+        }
+
+        // 4. Steep Brunjung Central Roof Crown (`sCrown`) & Tall Garuda Spire (`chimMode`)
+        if (newWy > 2.48) {
+          newWy = 2.48 + (newWy - 2.48) * sCrown;
+        }
+        if (isChimney && chimMode === 'tall' && wy > 3.60) {
+          const baseApex = 2.48 + (3.60 - 2.48) * sCrown;
+          newWy = baseApex + (newWy - baseApex) * 1.65;
         }
 
         dst[i3]     = newWx - mbpX;
         dst[i3 + 1] = newWy - mbpY;
-        dst[i3 + 2] = wz - mbpZ;
+        dst[i3 + 2] = newWz - mbpZ;
       }
       posAttr.needsUpdate = true;
     }
   }
 
-  const needChassisDeform = (
+  const needPlinthDeform = (
     !lastDeformState.initialized ||
     Math.abs(sy - lastDeformState.sy) > 1e-4 ||
-    Math.abs(frontHubDeltaY - lastDeformState.frontHubDeltaY) > 1e-4 ||
-    Math.abs(rearHubDeltaY - lastDeformState.rearHubDeltaY) > 1e-4 ||
     Math.abs(totalLiftY - lastDeformState.totalLiftY) > 1e-4
   );
 
-  if (needChassisDeform) {
+  if (needPlinthDeform) {
     for (const m of undercarriageMeshes) {
       const posAttr = m.geometry?.attributes?.position;
       const orig = m.geometry?.userData?.origPos;
@@ -149,31 +166,17 @@ export function deformCarriageGeometry(sy, sCrown, sCab, chimMode, frontHubDelta
 
       const dst = posAttr.array;
       const count = posAttr.count;
+      const liftUnscaled = totalLiftY / sy;
       for (let i = 0; i < count; i++) {
         const i3 = i * 3;
         const lx = orig[i3];
         const ly = orig[i3 + 1];
         const lz = orig[i3 + 2];
 
-        // Interpolate axle height between Rear Axle (z = -1.42) and Front Axle (z = +1.25)
-        const zNorm = Math.max(0.0, Math.min(1.0, (lz - (-1.42)) / (1.25 - (-1.42))));
-        const axleDeltaUnscaled = ((1.0 - zNorm) * rearHubDeltaY + zNorm * frontHubDeltaY) / sy;
-        const cabinDeltaUnscaled = totalLiftY / sy;
-
-        // Smooth leaf-spring flex between axle hub level (y <= 0.60) and cabin floor mount (y >= 0.78)
-        const springT = Math.max(0.0, Math.min(1.0, (ly - 0.60) / (0.78 - 0.60)));
-        let newLy = ly + axleDeltaUnscaled * (1.0 - springT) + cabinDeltaUnscaled * springT;
-
-        // Keep front draft hitch finial well clear of the ground at all height/wheel settings
-        if (lz > 1.35 && ly < 0.45) {
-          const minGroundClearance = 0.22 / sy;
-          if (newLy < minGroundClearance) {
-            newLy = minGroundClearance + ly * 0.22;
-          }
-        }
-
+        // Stretch the Undak-Undakan stone plinth smoothly from ground (y=0) up to the elevated floor
+        const tPlinth = Math.max(0.0, Math.min(1.0, ly / 0.34));
         dst[i3]     = lx;
-        dst[i3 + 1] = newLy;
+        dst[i3 + 1] = ly + liftUnscaled * tPlinth;
         dst[i3 + 2] = lz;
       }
       posAttr.needsUpdate = true;
@@ -185,8 +188,9 @@ export function deformCarriageGeometry(sy, sCrown, sCab, chimMode, frontHubDelta
   lastDeformState.sCab = sCab;
   lastDeformState.chimMode = chimMode;
   lastDeformState.sy = sy;
-  lastDeformState.frontHubDeltaY = frontHubDeltaY;
-  lastDeformState.rearHubDeltaY = rearHubDeltaY;
+  lastDeformState.sWF = sWF;
+  lastDeformState.sRim = sRim;
+  lastDeformState.camberDeg = camberDeg;
   lastDeformState.totalLiftY = totalLiftY;
 }
 
@@ -201,12 +205,13 @@ export function syncAllCarriageTransforms({ uiRefs, lights, cobblePatch, roadSto
   const sWR = carriageConfig.rearWheelScale;
   const sRim = carriageConfig.wheelRimScale;
   const chimMode = carriageConfig.chimneyMode;
+  const camberDeg = carriageConfig.wheelCamberDeg;
 
   // Update Metric Badges & Right-Column Elevation Readouts
-  const effHeightScale = sy * (0.78 + 0.22 * sCrown) + rideY / 3.2;
-  const wText = formatMetricMM(BASE_WIDTH_MM * sx);
+  const effHeightScale = sy * (0.72 + 0.28 * sCrown) + rideY / 3.8;
+  const wText = formatMetricMM(BASE_WIDTH_MM * sx * (0.85 + 0.15 * sCab));
   const hText = formatMetricMM(BASE_HEIGHT_MM * effHeightScale);
-  const lText = formatMetricMM(BASE_LENGTH_MM * sz);
+  const lText = formatMetricMM(BASE_LENGTH_MM * sz * (0.85 + 0.15 * sCab));
 
   if (uiRefs.valWidthBadge) uiRefs.valWidthBadge.textContent = wText;
   if (uiRefs.valHeightBadge) uiRefs.valHeightBadge.textContent = hText;
@@ -215,23 +220,22 @@ export function syncAllCarriageTransforms({ uiRefs, lights, cobblePatch, roadSto
   if (uiRefs.elevMmHeight) uiRefs.elevMmHeight.textContent = hText;
   if (uiRefs.elevMmLength) uiRefs.elevMmLength.textContent = lText;
 
-  const baseWheelScale = Math.min(sy, sz);
   if (uiRefs.valRoofCrown) uiRefs.valRoofCrown.textContent = `${Math.round(sCrown * 100)}%`;
   if (uiRefs.valRideHeight) {
-    const mm = Math.round(rideY * 1000);
+    const mm = Math.round(rideY * 2200);
     uiRefs.valRideHeight.textContent = `+${mm} MM`;
   }
   if (uiRefs.valCabinScale) uiRefs.valCabinScale.textContent = `${Math.round(sCab * 100)}%`;
-  if (uiRefs.valWheelFront) uiRefs.valWheelFront.textContent = formatMetricMM(BASE_FRONT_WHEEL_MM * baseWheelScale * sWF);
-  if (uiRefs.valWheelRear) uiRefs.valWheelRear.textContent = formatMetricMM(BASE_REAR_WHEEL_MM * baseWheelScale * sWR);
+  if (uiRefs.valWheelFront) uiRefs.valWheelFront.textContent = formatMetricMM(BASE_FRONT_WHEEL_MM * sWF);
+  if (uiRefs.valWheelRear) uiRefs.valWheelRear.textContent = formatMetricMM(BASE_REAR_WHEEL_MM * sWR);
   if (uiRefs.valWheelRim) uiRefs.valWheelRim.textContent = `${Math.round(sRim * 100)}%`;
-  if (uiRefs.valWheelCamber) uiRefs.valWheelCamber.textContent = `${carriageConfig.wheelCamberDeg.toFixed(1)}°`;
+  if (uiRefs.valWheelCamber) uiRefs.valWheelCamber.textContent = `${camberDeg.toFixed(1)}°`;
   if (uiRefs.valDriveSpeed) uiRefs.valDriveSpeed.textContent = `${Math.round(carriageConfig.driveSpeedMult * 100)}%`;
 
   if (updateAtelierSummary) updateAtelierSummary();
 
   // Subtly scale right-column technical elevation drawings to mirror custom proportions
-  const clampS = (v) => Math.max(0.84, Math.min(1.12, 1.0 + (v - 1.0) * 0.55));
+  const clampS = (v) => Math.max(0.84, Math.min(1.14, 1.0 + (v - 1.0) * 0.55));
   if (uiRefs.imgElevSide) {
     uiRefs.imgElevSide.style.transformOrigin = 'center bottom';
     uiRefs.imgElevSide.style.transform = `scale(${clampS(sz).toFixed(3)}, ${clampS(effHeightScale).toFixed(3)})`;
@@ -245,40 +249,29 @@ export function syncAllCarriageTransforms({ uiRefs, lights, cobblePatch, roadSto
     uiRefs.imgElevRear.style.transform = `scale(${clampS(sx).toFixed(3)}, ${clampS(effHeightScale).toFixed(3)})`;
   }
 
-  // 1. Update 4 Spoked Wheels (Circular in Y-Z plane, grounded at y = 0, constrained by min(sy, sz))
+  const umpakExtraLift = (sWR - 1.0) * 0.14 * sy;
+  const totalLiftY = rideY + Math.max(0, umpakExtraLift);
+  kinematicState.currentTotalLiftY = totalLiftY;
+
+  // 1. Update 4 Master Umpak Soko Guru Pedestals
   for (const key of ['FL', 'FR', 'RL', 'RR']) {
     const w = wheelRig[key];
-    const wDiaScale = w.isFront ? (baseWheelScale * sWF) : (baseWheelScale * sWR);
-    w.radius = w.baseRadius * wDiaScale;
-    // Shift wider rims outward so extra tire width never grows inward into the leaf springs or belly trough
-    const outwardRimShift = w.side * Math.max(0.0, sRim - 1.0) * 0.14 * sx;
+    w.radius = w.baseRadius * sWR;
     w.restPos.set(
-      w.basePos.x * sx + outwardRimShift,
-      w.radius,
+      w.basePos.x * sx,
+      0.54 * sy + rideY + umpakExtraLift * 0.5,
       w.basePos.z * sz
     );
     for (const m of w.meshes) {
       m.userData.restPosition.copy(w.restPos);
-      m.scale.set(sx * sRim, wDiaScale, wDiaScale);
+      m.scale.set(sx * sWF, sy * sWR, sz * sWF);
     }
   }
 
-  // 2. Compute Axle Hub Deltas & Guaranteed Wheel-Top Fender Arch Clearance
-  const frontHubDeltaY = wheelRig.FL.radius - 0.55 * sy;
-  const rearHubDeltaY  = wheelRig.RL.radius - 0.63 * sy;
-  kinematicState.avgAxleLiftY = 0.5 * (frontHubDeltaY + rearHubDeltaY);
-  kinematicState.stancePitchRad = 0.0;
+  // 2. Apply Vertex-Level Deformation for Brunjung Pitch, Eave Overhang, Column Girth & Plinth Step
+  deformCarriageGeometry(sy, sCrown, sCab, chimMode, sWF, sRim, camberDeg, totalLiftY);
 
-  const minLiftForFrontArch = (2.0 * wheelRig.FL.radius + 0.025 * sy) - 1.10 * sy;
-  const minLiftForRearArch  = (2.0 * wheelRig.RL.radius + 0.025 * sy) - 1.26 * sy;
-  const cabinWheelLiftY = Math.max(kinematicState.avgAxleLiftY, minLiftForFrontArch, minLiftForRearArch);
-  const totalLiftY = cabinWheelLiftY + rideY;
-  kinematicState.currentTotalLiftY = totalLiftY;
-
-  // 3. Apply Seamless Vertex-Level Deformation for Roof Vault Crown, Upper-Cabin Flare & Undercarriage Leaf-Spring Flex
-  deformCarriageGeometry(sy, sCrown, sCab, chimMode, frontHubDeltaY, rearHubDeltaY, totalLiftY);
-
-  // 4. Update Undercarriage & Sprung Cabin Transforms (Cohesive X, Y, Z Scaling with Zero Desync)
+  // 3. Update Plinth & Sprung Pavilion Transforms
   for (const m of undercarriageMeshes) {
     const bp = m.userData.basePosition;
     m.userData.restPosition.set(bp.x * sx, bp.y * sy, bp.z * sz);
@@ -288,15 +281,10 @@ export function syncAllCarriageTransforms({ uiRefs, lights, cobblePatch, roadSto
   for (const m of sprungBodyMeshes) {
     const mbp = m.userData.morphedBasePos || m.userData.basePosition;
     m.userData.restPosition.set(mbp.x * sx, mbp.y * sy + totalLiftY, mbp.z * sz);
-    if (m.userData.morphedDoorHinge) {
-      const mdh = m.userData.morphedDoorHinge;
-      if (!m.userData.doorRestHinge) m.userData.doorRestHinge = new THREE.Vector3();
-      m.userData.doorRestHinge.set(mdh.x * sx, mdh.y * sy + totalLiftY, mdh.z * sz);
-    }
     m.scale.set(sx, sy, sz);
   }
 
-  // 5. Component Visibility Modes (Wheel Style, Medallions, Chimney, Lanterns)
+  // 4. Component Visibility Modes (Umpak/Langkan Style, Gebyok Crest, Mustaka Crown, Lanterns)
   const wStyle = carriageConfig.wheelStyle;
   wheelTraceryMeshes.forEach((m) => { m.visible = (wStyle === 'tracery'); });
   wheelDiscMeshes.forEach((m) => { m.visible = (wStyle === 'disc'); });
@@ -311,29 +299,24 @@ export function syncAllCarriageTransforms({ uiRefs, lights, cobblePatch, roadSto
   frontLanternMeshes.forEach((m) => { m.visible = (lMode === 'all' || lMode === 'front'); });
   rearLanternMeshes.forEach((m) => { m.visible = (lMode === 'all'); });
 
-  // 6. Reposition Interior & Exterior Coach Lantern Point Lights
+  // 5. Reposition Pendopo Robyong Chandelier & Dalem Sanctuary Point Lights
   if (lights) {
-    evalMorphedBodyPoint(0.0, 1.85, -0.25, lights.interiorGlow.position);
-    evalMorphedBodyPoint(0.0, 2.06,  1.38, lights.frontLanternGlow.position);
-    evalMorphedBodyPoint(0.0, 2.06, -1.88, lights.rearLanternGlow.position);
+    evalMorphedBodyPoint(0.0, 2.05,  0.35, lights.frontLanternGlow.position);
+    evalMorphedBodyPoint(0.0, 1.55, -1.35, lights.interiorGlow.position);
+    evalMorphedBodyPoint(0.0, 1.80, -1.65, lights.rearLanternGlow.position);
   }
 
-  // 7. Adjust Cobblestone Road Patch & 3D Road Stone Wheel Tracks
+  // 6. Adjust Courtyard Pelataran Patch & Stone Garden Urns
   if (cobblePatch) cobblePatch.scale.set(sx, 1.0, sz);
   if (roadStones) {
     for (const st of roadStones) {
-      st.x = st.side * 0.96 * sx;
-      st.mesh.position.x = st.x;
+      st.mesh.position.set(st.x * sx, 0.005, st.z * sz);
     }
   }
 
-  // 8. Scale 3D Callout Leader Anchors
+  // 7. Scale 3D Callout Leader Anchors
   evalMorphedBodyPoint(baseCalloutAnchors3D['1'].x, baseCalloutAnchors3D['1'].y, baseCalloutAnchors3D['1'].z, calloutAnchors3D['1']);
   evalMorphedBodyPoint(baseCalloutAnchors3D['2'].x, baseCalloutAnchors3D['2'].y, baseCalloutAnchors3D['2'].z, calloutAnchors3D['2']);
   evalMorphedBodyPoint(baseCalloutAnchors3D['3'].x, baseCalloutAnchors3D['3'].y, baseCalloutAnchors3D['3'].z, calloutAnchors3D['3']);
-  calloutAnchors3D['4'].set(
-    wheelRig.RL.restPos.x,
-    wheelRig.RL.radius,
-    wheelRig.RL.restPos.z
-  );
+  evalMorphedBodyPoint(baseCalloutAnchors3D['4'].x, baseCalloutAnchors3D['4'].y, baseCalloutAnchors3D['4'].z, calloutAnchors3D['4']);
 }
